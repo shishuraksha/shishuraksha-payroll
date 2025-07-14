@@ -5,10 +5,9 @@
 
 // Utility Functions
 function getCurrentMonthString() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    return `${year}-${month}`;
+    // Current month for the payroll system - July 2025
+    // Update this value as months progress (Aug = '2025-08', Sep = '2025-09', etc.)
+    return '2025-07';
 }
 
 // Global Variables

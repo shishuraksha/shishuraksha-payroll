@@ -7,7 +7,7 @@ class MonthDataService {
     constructor() {
         this.currentMonth = null;
         this.availableMonths = [];
-        this.organizationStartDate = new Date('2024-01-01'); // When the organization started using this system
+        this.organizationStartDate = new Date('2025-06-01'); // June 2025 - When the organization started using this system
     }
 
     /**
@@ -22,12 +22,14 @@ class MonthDataService {
 
     /**
      * Get current month in YYYY-MM format
+     * Currently July 2025 - easily adjustable for future months
      */
     getCurrentMonthString() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        return `${year}-${month}`;
+        // Current month for the payroll system - update this as months progress
+        return '2025-07'; // July 2025 (current)
+        
+        // To advance to next month, simply change to '2025-08' for August, etc.
+        // This makes it easy to control the current month for the system
     }
 
     /**
@@ -40,15 +42,11 @@ class MonthDataService {
     }
 
     /**
-     * Populate the month selector with past months and current month
+     * Populate the month selector with months from June 2025 to current month
      */
     async populateMonthSelector() {
         const selector = document.getElementById('monthSelector');
         if (!selector) return;
-
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonthNum = now.getMonth() + 1;
 
         // Clear existing options
         selector.innerHTML = '';
@@ -56,10 +54,12 @@ class MonthDataService {
         // Get available months from database
         const dbMonths = await this.getMonthsWithData();
         
-        // Generate months from organization start to current month
+        // Generate months from June 2025 to current month (July 2025)
         const months = [];
-        let startDate = new Date(this.organizationStartDate);
-        const endDate = new Date(currentYear, currentMonthNum - 1); // Current month
+        let startDate = new Date(this.organizationStartDate); // June 2025
+        const currentMonthString = this.getCurrentMonthString(); // 2025-07
+        const [currentYear, currentMonthNum] = currentMonthString.split('-').map(Number);
+        const endDate = new Date(currentYear, currentMonthNum - 1); // July 2025
 
         while (startDate <= endDate) {
             const year = startDate.getFullYear();
@@ -69,7 +69,8 @@ class MonthDataService {
             months.push({
                 value: monthString,
                 name: this.getMonthName(monthString),
-                hasData: dbMonths.includes(monthString)
+                hasData: dbMonths.includes(monthString),
+                isCurrent: monthString === currentMonthString
             });
 
             // Move to next month
@@ -83,9 +84,17 @@ class MonthDataService {
         months.forEach(month => {
             const option = document.createElement('option');
             option.value = month.value;
-            option.textContent = month.hasData ? 
-                `${month.name} ✓` : 
-                month.name;
+            
+            // Add indicators for current month and data availability
+            let displayText = month.name;
+            if (month.isCurrent) {
+                displayText += ' (Current)';
+            }
+            if (month.hasData) {
+                displayText += ' ✓';
+            }
+            
+            option.textContent = displayText;
             
             // Select current month by default
             if (month.value === this.currentMonth) {
@@ -95,7 +104,7 @@ class MonthDataService {
             selector.appendChild(option);
         });
 
-        console.log(`📅 Populated ${months.length} months in selector`);
+        console.log(`📅 Populated ${months.length} months in selector (June 2025 - ${currentMonthString})`);
     }
 
     /**
