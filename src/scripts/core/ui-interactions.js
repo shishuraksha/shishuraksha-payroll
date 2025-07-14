@@ -3,11 +3,19 @@
  * Handles user interface interactions, navigation, modals, and search functionality
  */
 
+// Utility Functions
+function getCurrentMonthString() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    return `${year}-${month}`;
+}
+
 // Global Variables
 let employees = [];
 let attendance = {};
 let payrollData = [];
-let currentMonth = '2025-06';
+let currentMonth = getCurrentMonthString();
 let activities = [];
 let darkMode = false;
 let departments = ['IT', 'HR', 'Accounts', 'Sales', 'Marketing'];
@@ -19,12 +27,48 @@ document.addEventListener('DOMContentLoaded', function() {
     setupAutoSave();
 });
 
-function initializeApp() {
+function setupAutoSave() {
+    // Auto-save every 30 seconds
+    setInterval(async () => {
+        if (window.monthDataService && currentMonth) {
+            await saveCurrentMonthData();
+        } else {
+            saveToLocalStorage();
+        }
+    }, 30000);
+    
+    // Also save when user leaves the page
+    window.addEventListener('beforeunload', async () => {
+        if (window.monthDataService && currentMonth) {
+            await saveCurrentMonthData();
+        }
+    });
+}
+
+async function initializeApp() {
+    // Wait for month service to be ready
+    if (window.monthDataService) {
+        await new Promise(resolve => {
+            if (window.monthDataService.currentMonth) {
+                resolve();
+            } else {
+                window.addEventListener('monthServiceReady', resolve, { once: true });
+            }
+        });
+    }
+
     const dataLoaded = loadFromLocalStorage();
     if (!dataLoaded || employees.length === 0) {
         generateSampleData();
         console.log('No saved data found, generated sample data');
     }
+    
+    // Load data for current month
+    if (window.monthDataService) {
+        currentMonth = window.monthDataService.getCurrentMonth();
+        await loadMonthData(currentMonth);
+    }
+    
     updateDashboard();
     displayEmployees();
     displayAttendance();
@@ -588,29 +632,97 @@ function setupKeyboardShortcuts() {
 }
 
 // Month Change Function
-function changeMonth() {
-    currentMonth = document.getElementById('monthSelector').value;
+async function changeMonth() {
+    const newMonth = document.getElementById('monthSelector').value;
     
-    // Initialize attendance for new month if not exists
-    if (!attendance[currentMonth]) {
-        attendance[currentMonth] = {};
-        employees.forEach(emp => {
-            if (emp.status === 'Active') {
-                attendance[currentMonth][emp.id] = generateMonthlyAttendance();
-            }
-        });
+    if (!newMonth) return;
+    
+    console.log(`📅 Changing month from ${currentMonth} to ${newMonth}`);
+    
+    // Save current month data before switching
+    if (currentMonth && currentMonth !== newMonth) {
+        await saveCurrentMonthData();
     }
     
-    // Reset payroll data
-    payrollData = [];
+    // Update current month
+    currentMonth = newMonth;
+    
+    // Load data for the new month
+    await loadMonthData(newMonth);
     
     // Update all views
     updateDashboard();
     displayAttendance();
     displayPayroll();
     
-    addActivity('Changed month to ' + currentMonth);
-    saveToLocalStorage();
+    addActivity(`Switched to ${window.monthDataService?.getMonthName(newMonth) || newMonth}`);
+    console.log(`✅ Month changed to ${newMonth}`);
+}
+
+// Save current month data
+async function saveCurrentMonthData() {
+    try {
+        if (!window.monthDataService) return;
+        
+        // Save attendance data
+        if (attendance[currentMonth]) {
+            await window.monthDataService.saveAttendanceData(currentMonth, attendance[currentMonth]);
+        }
+        
+        // Save payroll data if exists
+        if (payrollData && payrollData.length > 0) {
+            await window.monthDataService.savePayrollData(currentMonth, payrollData);
+        }
+        
+        console.log(`💾 Saved data for month ${currentMonth}`);
+        
+    } catch (error) {
+        console.error('Error saving month data:', error);
+        // Fallback to localStorage
+        saveToLocalStorage();
+    }
+}
+
+// Load data for specific month
+async function loadMonthData(monthString) {
+    try {
+        if (!window.monthDataService) {
+            // Fallback to localStorage
+            loadFromLocalStorage();
+            return;
+        }
+        
+        // Load attendance data
+        const attendanceData = await window.monthDataService.loadAttendanceData(monthString);
+        
+        // Initialize attendance for the month
+        if (!attendance[monthString]) {
+            attendance[monthString] = {};
+        }
+        
+        // Merge loaded data
+        attendance[monthString] = { ...attendance[monthString], ...attendanceData };
+        
+        // If no data exists for this month, generate sample data for active employees
+        if (Object.keys(attendance[monthString]).length === 0) {
+            employees.forEach(emp => {
+                if (emp.status === 'Active') {
+                    attendance[monthString][emp.id] = generateMonthlyAttendance();
+                }
+            });
+            console.log(`📊 Generated new attendance data for ${monthString}`);
+        }
+        
+        // Load payroll data
+        payrollData = await window.monthDataService.loadPayrollData(monthString);
+        
+        console.log(`📁 Loaded data for month ${monthString}`);
+        
+    } catch (error) {
+        console.error('Error loading month data:', error);
+        // Fallback to localStorage
+        loadFromLocalStorage();
+    }
 }
 
 // Notification Functions
