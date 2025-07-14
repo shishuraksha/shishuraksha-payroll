@@ -3,16 +3,24 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
       "source": "/",
       "destination": "/login.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/app",
       "destination": "/index.html"
+    },
+    {
+      "source": "/index.html",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login.html",
+      "destination": "/login.html"
     }
   ]
 }

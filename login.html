@@ -67,19 +67,19 @@
             </div>
 
             <form id="loginForm" class="space-y-4">
-                <!-- Username Field -->
+                <!-- Email Field -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-1">
-                        <i class="fas fa-user mr-1 text-gray-400"></i>Username
+                        <i class="fas fa-envelope mr-1 text-gray-400"></i>Email
                     </label>
                     <input 
-                        type="text" 
+                        type="email" 
                         id="username" 
                         name="username"
-                        placeholder="Enter your username"
+                        placeholder="Enter your email address"
                         required
                         class="compact-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                        autocomplete="username"
+                        autocomplete="email"
                     >
                 </div>
 
@@ -136,9 +136,9 @@
                     <i class="fas fa-key mr-1"></i>Demo Accounts
                 </h4>
                 <div class="text-xs space-y-1 text-gray-600">
-                    <div class="flex justify-between"><span>Admin:</span><span class="font-mono">admin / admin123</span></div>
-                    <div class="flex justify-between"><span>HR:</span><span class="font-mono">hr / hr123</span></div>
-                    <div class="flex justify-between"><span>Accounts:</span><span class="font-mono">accounts / acc123</span></div>
+                    <div class="flex justify-between"><span>Admin:</span><span class="font-mono">admin@shishuraksha.com / admin123</span></div>
+                    <div class="flex justify-between"><span>HR:</span><span class="font-mono">hr@shishuraksha.com / hr123</span></div>
+                    <div class="flex justify-between"><span>Accounts:</span><span class="font-mono">accounts@shishuraksha.com / acc123</span></div>
                 </div>
             </div>
 
@@ -162,10 +162,90 @@
         </div>
     </div>
 
-    <!-- Authentication Script -->
-    <script src="src/scripts/core/auth.js"></script>
+    <!-- Supabase Configuration and Auth -->
+    <script src="src/services/supabase-config.js" type="module"></script>
+    <script src="src/services/supabase-auth.js" type="module"></script>
     
     <script>
+        // Wait for auth service to be ready
+        let authServiceReady = false;
+        
+        window.addEventListener('authReady', () => {
+            authServiceReady = true;
+            console.log('✅ Auth service ready for login page');
+        });
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!authServiceReady) {
+                console.log('⏳ Waiting for auth service...');
+                await new Promise(resolve => {
+                    if (authServiceReady) {
+                        resolve();
+                    } else {
+                        window.addEventListener('authReady', resolve, { once: true });
+                    }
+                });
+            }
+            
+            const email = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            
+            // Validate inputs
+            if (!email || !password) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please enter both email and password',
+                    confirmButtonColor: '#ef4444'
+                });
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loginBtnText.textContent = 'Signing in...';
+            
+            try {
+                // Try to sign in with Supabase
+                await window.authService.signIn(email, password);
+                
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Successful!',
+                    text: `Welcome back!`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                
+                // Redirect will be handled automatically by the auth service
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    text: error.message || 'Invalid email or password. Please try again.',
+                    confirmButtonColor: '#ef4444'
+                });
+                
+                // Clear password field
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+                
+            } finally {
+                // Reset button state
+                loginBtn.disabled = false;
+                loginBtnText.textContent = 'Sign In';
+            }
+        });
+
         // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordField = document.getElementById('password');
@@ -188,27 +268,61 @@
         });
 
         // Forgot password function
-        function showForgotPassword() {
-            Swal.fire({
-                icon: 'info',
-                title: 'Forgot Password?',
-                html: `
-                    <p class="mb-4">Please contact your system administrator to reset your password.</p>
-                    <div class="text-sm text-gray-600">
-                        <strong>Contact:</strong><br>
-                        Email: admin@shishuraksha.com<br>
-                        Phone: +91 XXX XXX XXXX
-                    </div>
-                `,
-                confirmButtonText: 'Got it',
-                confirmButtonColor: '#3b82f6'
+        async function showForgotPassword() {
+            const { value: email } = await Swal.fire({
+                title: 'Reset Password',
+                input: 'email',
+                inputLabel: 'Enter your email address',
+                inputPlaceholder: 'your.email@example.com',
+                showCancelButton: true,
+                confirmButtonText: 'Send Reset Link',
+                confirmButtonColor: '#3b82f6',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Please enter your email address';
+                    }
+                    if (!value.includes('@')) {
+                        return 'Please enter a valid email address';
+                    }
+                }
             });
+
+            if (email) {
+                try {
+                    await window.authService.resetPassword(email);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Reset Link Sent!',
+                        text: `Password reset instructions have been sent to ${email}`,
+                        confirmButtonColor: '#3b82f6'
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Reset Failed',
+                        text: error.message || 'Failed to send reset email. Please try again.',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            }
         }
 
         // Handle Enter key
         document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && (e.target.id === 'username' || e.target.id === 'password')) {
                 document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Initialize default users on first load (development only)
+        window.addEventListener('authReady', async () => {
+            // Only run in development or if no users exist
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                try {
+                    await window.authService.initializeDefaultUsers();
+                } catch (error) {
+                    console.log('Default users initialization skipped:', error.message);
+                }
             }
         });
     </script>
