@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrected Payroll Calculation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">🔧 Fixed: Overtime Double-Counting Issue</h1>
+        
+        <!-- Problem Explanation -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-red-800 mb-4">
+                <i class="fas fa-exclamation-triangle mr-2"></i>Problem: Double-Counting Overtime
+            </h2>
+            <p class="text-red-700 mb-4">
+                <strong>Issue:</strong> Working days included OT, then OT amount was added again to gross salary. 
+                Also, PF/ESIC were calculated on gross salary including OT amount.
+            </p>
+            <div class="bg-white rounded p-4">
+                <h3 class="font-semibold text-red-600 mb-2">Incorrect Logic (Before):</h3>
+                <ul class="text-sm space-y-1">
+                    <li>• Working Days = 32 (includes P+OT counted as 2 days)</li>
+                    <li>• Basic = ₹1,000/day × 32 = ₹32,000 (already includes OT payment!)</li>
+                    <li>• OT Amount = 3 OT days × ₹1,000 × 1.5 = ₹4,500 (ADDITIONAL)</li>
+                    <li>• Gross = ₹32,000 + HRA + Conv + Other + ₹4,500 = <strong>DOUBLE COUNTED!</strong></li>
+                    <li>• PF/ESIC = calculated on full gross including OT amount</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Solution -->
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-green-800 mb-4">
+                <i class="fas fa-check-circle mr-2"></i>Solution: Separate Base and OT Calculations
+            </h2>
+            <div class="bg-white rounded p-4">
+                <h3 class="font-semibold text-green-600 mb-2">Corrected Logic (After):</h3>
+                <ul class="text-sm space-y-1">
+                    <li>• Base Working Days = 26 (P:22 + P+OT:3 + Offs:4 + Unused:0 - Absent:0)</li>
+                    <li>• Basic = ₹1,000/day × 26 = ₹26,000 (regular payment only)</li>
+                    <li>• OT Amount = 3 OT days × ₹1,000 × 1.5 = ₹4,500 (separate payment)</li>
+                    <li>• Gross = ₹26,000 + HRA + Conv + Other + ₹4,500 = <strong>CORRECT!</strong></li>
+                    <li>• PF/ESIC = calculated on basic components only (excluding OT)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Before (Incorrect) -->
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+                <h3 class="text-lg font-semibold text-red-600 mb-4">❌ Before (Incorrect)</h3>
+                <div class="space-y-3">
+                    <div class="bg-red-50 p-3 rounded">
+                        <h4 class="font-medium text-red-700">Your Scenario: 4 offs, 3 P+OT, 1 absent</h4>
+                        <p class="text-sm text-red-600">Basic Salary: ₹30,000/month</p>
+                    </div>
+                    
+                    <table class="w-full text-sm">
+                        <tr class="border-b">
+                            <td class="py-1 font-medium">Working Days:</td>
+                            <td class="py-1 text-right">32 days</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">Basic (₹1,000 × 32):</td>
+                            <td class="py-1 text-right">₹32,000</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">HRA (40% of basic):</td>
+                            <td class="py-1 text-right">₹12,800</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">Conveyance:</td>
+                            <td class="py-1 text-right">₹1,600</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">Other:</td>
+                            <td class="py-1 text-right">₹2,000</td>
+                        </tr>
+                        <tr class="border-b bg-red-100">
+                            <td class="py-1 font-medium text-red-700">OT Amount (3 × ₹1,500):</td>
+                            <td class="py-1 text-right font-medium text-red-700">₹4,500</td>
+                        </tr>
+                        <tr class="border-b font-bold">
+                            <td class="py-1">Gross Salary:</td>
+                            <td class="py-1 text-right">₹52,900</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">PF (12% of ₹15,000):</td>
+                            <td class="py-1 text-right">₹1,800</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">ESIC (0.75% of ₹52,900):</td>
+                            <td class="py-1 text-right">❌ ₹396</td>
+                        </tr>
+                        <tr class="bg-red-100 font-bold text-red-700">
+                            <td class="py-1">Problem:</td>
+                            <td class="py-1 text-right">Double OT + Wrong ESIC</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- After (Correct) -->
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                <h3 class="text-lg font-semibold text-green-600 mb-4">✅ After (Correct)</h3>
+                <div class="space-y-3">
+                    <div class="bg-green-50 p-3 rounded">
+                        <h4 class="font-medium text-green-700">Your Scenario: 4 offs, 3 P+OT, 1 absent</h4>
+                        <p class="text-sm text-green-600">Basic Salary: ₹30,000/month</p>
+                    </div>
+                    
+                    <table class="w-full text-sm">
+                        <tr class="border-b">
+                            <td class="py-1 font-medium">Base Working Days:</td>
+                            <td class="py-1 text-right">26 days</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">Basic (₹1,000 × 26):</td>
+                            <td class="py-1 text-right">₹26,000</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">HRA (40% of basic):</td>
+                            <td class="py-1 text-right">₹10,400</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">Conveyance:</td>
+                            <td class="py-1 text-right">₹1,600</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">Other:</td>
+                            <td class="py-1 text-right">₹2,000</td>
+                        </tr>
+                        <tr class="border-b bg-green-100">
+                            <td class="py-1 font-medium text-green-700">OT Amount (3 × ₹1,500):</td>
+                            <td class="py-1 text-right font-medium text-green-700">₹4,500</td>
+                        </tr>
+                        <tr class="border-b font-bold">
+                            <td class="py-1">Gross Salary:</td>
+                            <td class="py-1 text-right">₹44,500</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">PF (12% of ₹15,000):</td>
+                            <td class="py-1 text-right">₹1,800</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-1">ESIC (0.75% of ₹40,000):</td>
+                            <td class="py-1 text-right">✅ ₹300</td>
+                        </tr>
+                        <tr class="bg-green-100 font-bold text-green-700">
+                            <td class="py-1">Result:</td>
+                            <td class="py-1 text-right">Correct Calculation</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Benefits -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-blue-800 mb-4">
+                <i class="fas fa-lightbulb mr-2"></i>Key Benefits of the Fix
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h3 class="font-semibold text-blue-700 mb-2">✅ Accurate Calculations</h3>
+                    <ul class="text-sm text-blue-600 space-y-1">
+                        <li>• No more double-counting overtime</li>
+                        <li>• Basic salary reflects actual working days</li>
+                        <li>• OT amount is separate and clear</li>
+                        <li>• Total working days shown as Base+OT</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-blue-700 mb-2">✅ Correct Deductions</h3>
+                    <ul class="text-sm text-blue-600 space-y-1">
+                        <li>• PF calculated on basic salary only</li>
+                        <li>• ESIC on basic components (no OT)</li>
+                        <li>• PT based on gross (including OT)</li>
+                        <li>• Compliant with regulations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display Format -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <i class="fas fa-eye mr-2"></i>New Display Format
+            </h2>
+            <p class="text-gray-600 mb-4">In the payroll table, working days will now show:</p>
+            <div class="bg-white border rounded p-4 font-mono text-sm">
+                <div class="font-bold">32 <span class="text-gray-500 text-xs">(26+6OT)</span></div>
+                <div class="text-xs text-gray-500">P:22 P+OT:3 O:4 A:1</div>
+                <div class="text-xs text-green-600">+0 unused offs</div>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">
+                This clearly shows: Total days (Base working days + OT days)
+            </p>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="index.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-arrow-left mr-2"></i>Test the Fixed Calculation
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Reports Issue</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <h1>Debug Reports Issue</h1>
+    <p><strong>Instructions:</strong></p>
+    <ol>
+        <li>Open browser console (F12)</li>
+        <li>Click the test button below</li>
+        <li>Check console for detailed debug output</li>
+    </ol>
+    
+    <button onclick="testReportFunctions()" style="padding: 15px; font-size: 16px; background: #2563eb; color: white; border: none; border-radius: 5px;">
+        🔍 Test Report Functions
+    </button>
+    
+    <div id="payslipModal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="modal-content w-full max-w-4xl mx-4">
+            <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Generate Payslips</h3>
+                <div id="payslipEmployeeList" class="space-y-2 mb-6 max-h-60 overflow-y-auto">
+                    <!-- Employee checkboxes will be populated here -->
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button onclick="closeModal('payslipModal')" class="px-6 py-2 bg-gray-300">Cancel</button>
+                    <button onclick="alert('Generate button clicked')" class="px-6 py-2 bg-blue-600 text-white">Generate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set up the exact same environment as the main app
+        window.employees = [
+            {id: 'EMP001', name: 'John Doe', department: 'IT', status: 'Active', basicSalary: 50000, bankAccount: '1234567890', ifsc: 'HDFC0001234'},
+            {id: 'EMP002', name: 'Jane Smith', department: 'HR', status: 'Active', basicSalary: 45000, bankAccount: '0987654321', ifsc: 'SBIN0001234'}
+        ];
+        
+        window.payrollData = [];  // Start with empty payroll data to mimic the issue
+        window.attendance = {};
+        window.currentMonth = '2025-06';
+        window.activities = [];
+        
+        // Mock functions
+        window.addActivity = function(msg) { console.log('📝 Activity:', msg); };
+        window.saveToLocalStorage = function() { console.log('💾 Saved to localStorage'); };
+        window.switchTab = function(tab) { console.log('🔄 Switch to tab:', tab); };
+        window.closeModal = function(id) { 
+            console.log('❌ Close modal:', id);
+            document.getElementById(id).classList.add('hidden');
+        };
+        
+        // Mock processPayroll function that actually populates payrollData
+        window.processPayroll = function(notify) {
+            console.log('⚙️ processPayroll called, notify:', notify);
+            
+            // Simulate payroll processing
+            window.payrollData = [
+                {
+                    id: 'EMP001', name: 'John Doe', department: 'IT', 
+                    workingDays: 22, basic: 50000, hra: 20000, conveyance: 1600, 
+                    otherAllowances: 2000, overtimeAmount: 0, grossSalary: 73600,
+                    pf: 6000, esic: 552, pt: 200, advance: 0, totalDeductions: 6752, netPay: 66848,
+                    bankAccount: '1234567890', ifsc: 'HDFC0001234'
+                },
+                {
+                    id: 'EMP002', name: 'Jane Smith', department: 'HR',
+                    workingDays: 22, basic: 45000, hra: 18000, conveyance: 1600,
+                    otherAllowances: 2000, overtimeAmount: 0, grossSalary: 66600,
+                    pf: 5400, esic: 499, pt: 200, advance: 0, totalDeductions: 6099, netPay: 60501,
+                    bankAccount: '0987654321', ifsc: 'SBIN0001234'
+                }
+            ];
+            
+            console.log('✅ Payroll processed, data length:', window.payrollData.length);
+            return true; 
+        };
+        
+        function testReportFunctions() {
+            console.log('🚀 === STARTING REPORT FUNCTION TEST ===');
+            console.log('📊 Initial state:', {
+                employees: window.employees.length,
+                payrollData: window.payrollData.length,
+                currentMonth: window.currentMonth
+            });
+            
+            try {
+                console.log('🔍 Testing showPayslipSelector...');
+                showPayslipSelector();
+                console.log('✅ showPayslipSelector completed without errors');
+            } catch (error) {
+                console.error('❌ Error in showPayslipSelector:', error);
+            }
+        }
+        
+        console.log('🏁 Debug environment initialized');
+    </script>
+    
+    <!-- Load the actual PDF reports module -->
+    <script src="src/scripts/modules/pdf-reports.js"></script>
+    
+    <style>
+        .modal-backdrop.hidden { display: none; }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Advance Download</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { margin: 10px; padding: 15px 25px; font-size: 16px; cursor: pointer; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .result { background: #f5f5f5; padding: 15px; margin: 10px 0; border-left: 4px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Advance Download Test</h1>
+    
+    <div>
+        <button onclick="setupTestData()">1. Setup Test Data</button>
+        <button onclick="testLibraries()">2. Test Libraries</button>
+        <button onclick="testReport()">3. Test Report Generation</button>
+        <button onclick="testDownload()">4. Test Excel Download</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        // Mock employees data
+        let employees = [
+            {id: 'EMP001', name: 'John Doe', department: 'IT', status: 'Active'},
+            {id: 'EMP002', name: 'Jane Smith', department: 'HR', status: 'Active'},
+            {id: 'EMP003', name: 'Mike Johnson', department: 'Sales', status: 'Active'}
+        ];
+        
+        let currentMonth = '2025-06';
+
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            results.innerHTML += `<div class="result ${className}">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+        }
+
+        function setupTestData() {
+            try {
+                const mockAdvanceLoans = {
+                    'EMP001': [
+                        {
+                            id: '1721234567890',
+                            employeeId: 'EMP001',
+                            totalAmount: 10000,
+                            emiAmount: 2000,
+                            emiMonths: 5,
+                            remainingAmount: 6000,
+                            remainingMonths: 3,
+                            status: 'active',
+                            startMonth: '2025-05',
+                            createdDate: '2025-05-01T00:00:00.000Z',
+                            history: [
+                                { month: '2025-05', amount: 2000, date: '2025-05-31T00:00:00.000Z', remainingAfter: 8000, type: 'regular' },
+                                { month: '2025-06', amount: 2000, date: '2025-06-30T00:00:00.000Z', remainingAfter: 6000, type: 'regular' }
+                            ]
+                        }
+                    ],
+                    'EMP002': [
+                        {
+                            id: '1721234567891',
+                            employeeId: 'EMP002',
+                            totalAmount: 15000,
+                            emiAmount: 3000,
+                            emiMonths: 5,
+                            remainingAmount: 12000,
+                            remainingMonths: 4,
+                            status: 'active',
+                            startMonth: '2025-06',
+                            createdDate: '2025-06-01T00:00:00.000Z',
+                            history: []
+                        }
+                    ]
+                };
+
+                localStorage.setItem('payroll_advanceLoans', JSON.stringify(mockAdvanceLoans));
+                log('✅ Test data setup successful', 'success');
+                
+                // Verify storage
+                const verify = localStorage.getItem('payroll_advanceLoans');
+                if (verify) {
+                    const parsed = JSON.parse(verify);
+                    log(`✅ Verified ${Object.keys(parsed).length} employees with advance loans`, 'success');
+                } else {
+                    log('❌ Failed to verify test data in localStorage', 'error');
+                }
+            } catch (error) {
+                log(`❌ Error setting up test data: ${error.message}`, 'error');
+            }
+        }
+
+        function testLibraries() {
+            try {
+                // Check XLSX
+                if (typeof XLSX !== 'undefined') {
+                    log('✅ XLSX library loaded successfully', 'success');
+                    log(`   Version: ${XLSX.version || 'Unknown'}`, 'info');
+                } else {
+                    log('❌ XLSX library not available', 'error');
+                    return;
+                }
+
+                // Check SweetAlert2
+                if (typeof Swal !== 'undefined') {
+                    log('✅ SweetAlert2 loaded successfully', 'success');
+                } else {
+                    log('❌ SweetAlert2 not available', 'error');
+                }
+
+                // Test simple XLSX functionality
+                const testWB = XLSX.utils.book_new();
+                const testWS = XLSX.utils.aoa_to_sheet([['Test'], ['Data']]);
+                XLSX.utils.book_append_sheet(testWB, testWS, 'Test');
+                log('✅ XLSX workbook creation test passed', 'success');
+
+            } catch (error) {
+                log(`❌ Library test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testReport() {
+            try {
+                // Load the advance reports script first
+                if (typeof generateAdvanceReport !== 'function') {
+                    log('📄 Loading advance reports script...', 'info');
+                    const script = document.createElement('script');
+                    script.src = 'public/js/reports/advance-reports.js';
+                    script.onload = () => {
+                        log('✅ Script loaded, testing report generation...', 'success');
+                        setTimeout(testReportGeneration, 500);
+                    };
+                    script.onerror = () => {
+                        log('❌ Failed to load advance reports script', 'error');
+                    };
+                    document.head.appendChild(script);
+                    return;
+                }
+                
+                testReportGeneration();
+            } catch (error) {
+                log(`❌ Error in test report: ${error.message}`, 'error');
+            }
+        }
+
+        function testReportGeneration() {
+            try {
+                if (typeof generateAdvanceReport !== 'function') {
+                    log('❌ generateAdvanceReport function not available', 'error');
+                    return;
+                }
+
+                const report = generateAdvanceReport();
+                
+                if (report) {
+                    log('✅ Report generated successfully', 'success');
+                    log(`   📊 ${report.summary.totalEmployeesWithLoans} employees with loans`, 'info');
+                    log(`   💰 Total pending: ₹${report.summary.totalActiveAmount.toLocaleString('en-IN')}`, 'info');
+                    log(`   📋 ${report.employeeDetails.length} employee records`, 'info');
+                } else {
+                    log('❌ Report generation returned null/undefined', 'error');
+                }
+            } catch (error) {
+                log(`❌ Report generation error: ${error.message}`, 'error');
+            }
+        }
+
+        function testDownload() {
+            try {
+                if (typeof XLSX === 'undefined') {
+                    log('❌ XLSX library not available for download test', 'error');
+                    return;
+                }
+
+                log('🔄 Testing Excel download...', 'info');
+
+                // Test if quickExportAdvanceExcel is available
+                if (typeof quickExportAdvanceExcel === 'function') {
+                    log('✅ quickExportAdvanceExcel function found', 'success');
+                    quickExportAdvanceExcel();
+                    log('✅ Download function executed', 'success');
+                } else {
+                    log('⚠️ quickExportAdvanceExcel not found, trying manual export', 'info');
+                    
+                    // Manual download test
+                    const wb = XLSX.utils.book_new();
+                    const testData = [
+                        ['Employee', 'Department', 'Active Loans', 'Pending Amount'],
+                        ['John Doe', 'IT', '1', '6000'],
+                        ['Jane Smith', 'HR', '1', '12000']
+                    ];
+                    const ws = XLSX.utils.aoa_to_sheet(testData);
+                    XLSX.utils.book_append_sheet(wb, ws, 'Test');
+                    
+                    const filename = `Test_Advance_Report_${new Date().getTime()}.xlsx`;
+                    XLSX.writeFile(wb, filename);
+                    
+                    log(`✅ Manual Excel download successful: ${filename}`, 'success');
+                }
+
+            } catch (error) {
+                log(`❌ Download test failed: ${error.message}`, 'error');
+                console.error('Download error details:', error);
+            }
+        }
+
+        // Auto-setup on load
+        window.onload = function() {
+            log('🚀 Test page loaded, ready for testing', 'success');
+        };
+    </script>
+    
+    <!-- Load advance reports script -->
+    <script src="public/js/reports/advance-reports.js" onerror="console.error('Failed to load advance-reports.js')"></script>
+</body>
+</html>

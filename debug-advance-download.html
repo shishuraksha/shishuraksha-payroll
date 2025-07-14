@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Advance Download</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        button { margin: 5px; padding: 10px; }
+        .result { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Advance Download Debug Tool</h1>
+    
+    <div class="test-section">
+        <h2>1. Library Check</h2>
+        <button onclick="checkLibraries()">Check Required Libraries</button>
+        <div id="libraryResults" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Mock Data Setup</h2>
+        <button onclick="setupMockData()">Setup Test Data</button>
+        <div id="mockDataResults" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Function Availability</h2>
+        <button onclick="checkFunctions()">Check Functions</button>
+        <div id="functionResults" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Generate Report</h2>
+        <button onclick="testReportGeneration()">Test Report Generation</button>
+        <div id="reportResults" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Excel Export Test</h2>
+        <button onclick="testExcelExport()">Test Excel Export</button>
+        <div id="excelResults" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Simple Download Test</h2>
+        <button onclick="testSimpleDownload()">Test Simple Excel Download</button>
+        <div id="simpleResults" class="result"></div>
+    </div>
+
+    <script>
+        // Mock global variables
+        let employees = [
+            {id: 'EMP001', name: 'John Doe', department: 'IT', status: 'Active'},
+            {id: 'EMP002', name: 'Jane Smith', department: 'HR', status: 'Active'},
+            {id: 'EMP003', name: 'Mike Johnson', department: 'Sales', status: 'Active'}
+        ];
+        
+        let currentMonth = '2025-06';
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+            element.innerHTML += `<div class="${className}">${message}</div>`;
+        }
+
+        function checkLibraries() {
+            const results = document.getElementById('libraryResults');
+            results.innerHTML = '';
+
+            // Check XLSX
+            if (typeof XLSX !== 'undefined') {
+                log('libraryResults', '✅ XLSX library loaded successfully', 'success');
+                log('libraryResults', `XLSX version: ${XLSX.version || 'Unknown'}`, 'info');
+            } else {
+                log('libraryResults', '❌ XLSX library not found', 'error');
+            }
+
+            // Check SweetAlert2
+            if (typeof Swal !== 'undefined') {
+                log('libraryResults', '✅ SweetAlert2 loaded successfully', 'success');
+            } else {
+                log('libraryResults', '❌ SweetAlert2 not found', 'error');
+            }
+
+            // Check browser download capability
+            try {
+                const a = document.createElement('a');
+                if (typeof a.download !== 'undefined') {
+                    log('libraryResults', '✅ Browser supports download attribute', 'success');
+                } else {
+                    log('libraryResults', '⚠️ Browser might not support download attribute', 'warning');
+                }
+            } catch (e) {
+                log('libraryResults', '❌ Error checking download capability: ' + e.message, 'error');
+            }
+        }
+
+        function setupMockData() {
+            const results = document.getElementById('mockDataResults');
+            results.innerHTML = '';
+
+            try {
+                const mockAdvanceLoans = {
+                    'EMP001': [
+                        {
+                            id: '1721234567890',
+                            employeeId: 'EMP001',
+                            totalAmount: 10000,
+                            emiAmount: 2000,
+                            emiMonths: 5,
+                            remainingAmount: 6000,
+                            remainingMonths: 3,
+                            status: 'active',
+                            startMonth: '2025-05',
+                            createdDate: '2025-05-01T00:00:00.000Z',
+                            history: [
+                                { month: '2025-05', amount: 2000, date: '2025-05-31T00:00:00.000Z', remainingAfter: 8000, type: 'regular' },
+                                { month: '2025-06', amount: 2000, date: '2025-06-30T00:00:00.000Z', remainingAfter: 6000, type: 'regular' }
+                            ]
+                        }
+                    ],
+                    'EMP002': [
+                        {
+                            id: '1721234567891',
+                            employeeId: 'EMP002',
+                            totalAmount: 15000,
+                            emiAmount: 3000,
+                            emiMonths: 5,
+                            remainingAmount: 12000,
+                            remainingMonths: 4,
+                            status: 'active',
+                            startMonth: '2025-06',
+                            createdDate: '2025-06-01T00:00:00.000Z',
+                            history: [
+                                { month: '2025-06', amount: 3000, date: '2025-06-30T00:00:00.000Z', remainingAfter: 12000, type: 'regular' }
+                            ]
+                        }
+                    ],
+                    'EMP003': [
+                        {
+                            id: '1721234567892',
+                            employeeId: 'EMP003',
+                            totalAmount: 8000,
+                            emiAmount: 2000,
+                            emiMonths: 4,
+                            remainingAmount: 8000,
+                            remainingMonths: 4,
+                            status: 'active',
+                            startMonth: '2025-07',
+                            createdDate: '2025-06-30T00:00:00.000Z',
+                            history: []
+                        }
+                    ]
+                };
+
+                localStorage.setItem('payroll_advanceLoans', JSON.stringify(mockAdvanceLoans));
+                log('mockDataResults', '✅ Mock advance loans data created successfully', 'success');
+                log('mockDataResults', `Data for ${Object.keys(mockAdvanceLoans).length} employees`, 'info');
+                
+                // Verify data was stored
+                const stored = localStorage.getItem('payroll_advanceLoans');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    log('mockDataResults', `✅ Data verified in localStorage: ${Object.keys(parsed).length} employees`, 'success');
+                } else {
+                    log('mockDataResults', '❌ Data not found in localStorage after setting', 'error');
+                }
+
+            } catch (error) {
+                log('mockDataResults', `❌ Error setting up mock data: ${error.message}`, 'error');
+            }
+        }
+
+        function checkFunctions() {
+            const results = document.getElementById('functionResults');
+            results.innerHTML = '';
+
+            const functionsToCheck = [
+                'generateAdvanceReport',
+                'exportAdvanceReportExcel', 
+                'quickExportAdvanceExcel',
+                'showAdvanceReportModal'
+            ];
+
+            functionsToCheck.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    log('functionResults', `✅ ${funcName} is available`, 'success');
+                } else {
+                    log('functionResults', `❌ ${funcName} is not available`, 'error');
+                }
+            });
+
+            // Try to load the advance reports script if functions are missing
+            if (typeof window.generateAdvanceReport !== 'function') {
+                log('functionResults', '⚠️ Loading advance reports script...', 'warning');
+                const script = document.createElement('script');
+                script.src = 'public/js/reports/advance-reports.js';
+                script.onload = () => {
+                    log('functionResults', '✅ Script loaded, rechecking functions...', 'success');
+                    setTimeout(() => checkFunctions(), 500);
+                };
+                script.onerror = () => {
+                    log('functionResults', '❌ Failed to load advance reports script', 'error');
+                };
+                document.head.appendChild(script);
+            }
+        }
+
+        function testReportGeneration() {
+            const results = document.getElementById('reportResults');
+            results.innerHTML = '';
+
+            try {
+                if (typeof generateAdvanceReport !== 'function') {
+                    log('reportResults', '❌ generateAdvanceReport function not available', 'error');
+                    return;
+                }
+
+                log('reportResults', '🔄 Generating report...', 'info');
+                const report = generateAdvanceReport();
+                
+                if (report) {
+                    log('reportResults', '✅ Report generated successfully', 'success');
+                    log('reportResults', `📊 Summary: ${report.summary.totalEmployeesWithLoans} employees, ${report.summary.totalActiveLoans} active loans`, 'info');
+                    log('reportResults', `💰 Total pending: ₹${report.summary.totalActiveAmount.toLocaleString('en-IN')}`, 'info');
+                    
+                    if (report.employeeDetails && report.employeeDetails.length > 0) {
+                        log('reportResults', `👥 Employee details: ${report.employeeDetails.length} records`, 'success');
+                    } else {
+                        log('reportResults', '⚠️ No employee details in report', 'warning');
+                    }
+                    
+                    if (report.upcomingDeductions && report.upcomingDeductions.length > 0) {
+                        log('reportResults', `📅 Upcoming deductions: ${report.upcomingDeductions.length} months`, 'success');
+                    } else {
+                        log('reportResults', '⚠️ No upcoming deductions data', 'warning');
+                    }
+                } else {
+                    log('reportResults', '❌ Report generation returned null/undefined', 'error');
+                }
+
+            } catch (error) {
+                log('reportResults', `❌ Error generating report: ${error.message}`, 'error');
+                console.error('Report generation error:', error);
+            }
+        }
+
+        function testExcelExport() {
+            const results = document.getElementById('excelResults');
+            results.innerHTML = '';
+
+            try {
+                if (typeof XLSX === 'undefined') {
+                    log('excelResults', '❌ XLSX library not available', 'error');
+                    return;
+                }
+
+                if (typeof exportAdvanceReportExcel !== 'function') {
+                    log('excelResults', '❌ exportAdvanceReportExcel function not available', 'error');
+                    return;
+                }
+
+                log('excelResults', '🔄 Testing Excel export...', 'info');
+                exportAdvanceReportExcel();
+                log('excelResults', '✅ Excel export function called successfully', 'success');
+
+            } catch (error) {
+                log('excelResults', `❌ Error testing Excel export: ${error.message}`, 'error');
+                console.error('Excel export error:', error);
+            }
+        }
+
+        function testSimpleDownload() {
+            const results = document.getElementById('simpleResults');
+            results.innerHTML = '';
+
+            try {
+                log('simpleResults', '🔄 Creating simple Excel file...', 'info');
+
+                if (typeof XLSX === 'undefined') {
+                    log('simpleResults', '❌ XLSX not available', 'error');
+                    return;
+                }
+
+                // Create a simple workbook
+                const wb = XLSX.utils.book_new();
+                const wsData = [
+                    ['Test', 'Data', 'Download'],
+                    ['Employee', 'Amount', 'Status'],
+                    ['John Doe', '5000', 'Active'],
+                    ['Jane Smith', '3000', 'Active']
+                ];
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                XLSX.utils.book_append_sheet(wb, ws, 'Test');
+
+                // Try to download
+                const filename = `Test_Download_${new Date().getTime()}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                
+                log('simpleResults', `✅ Simple Excel download successful: ${filename}`, 'success');
+
+            } catch (error) {
+                log('simpleResults', `❌ Simple download failed: ${error.message}`, 'error');
+                console.error('Simple download error:', error);
+            }
+        }
+    </script>
+
+    <!-- Try to load the advance reports script -->
+    <script src="public/js/reports/advance-reports.js" onerror="console.error('Failed to load advance-reports.js')"></script>
+
+    <script>
+        // Auto-run initial checks
+        window.onload = function() {
+            console.log('🔍 Debug tool loaded, ready for testing');
+            checkLibraries();
+        };
+    </script>
+</body>
+</html>

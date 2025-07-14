@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Calculation - Test Your Scenario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Debug Calculation - Your Scenario</h1>
+        
+        <!-- Your Scenario -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-blue-600">
+                <i class="fas fa-bug mr-2"></i>Your Reported Scenario
+            </h2>
+            <p class="text-gray-600 mb-4">4 offs, 3 P+OT, 1 absent</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Before Fix -->
+                <div class="border rounded-lg p-4">
+                    <h3 class="font-semibold text-red-600 mb-2">Before Fix - Inconsistent Results</h3>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-medium text-gray-700">Attendance Display Logic:</h4>
+                        <ul class="text-sm space-y-1 mt-2">
+                            <li>• 4 offs = 4 days</li>
+                            <li>• 3 P+OT = 6 days (3 × 2)</li>
+                            <li>• Remaining ~22 Present days</li>
+                            <li>• <strong>Total: 32 days</strong> (ignored absent)</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-700">Payroll Logic:</h4>
+                        <ul class="text-sm space-y-1 mt-2">
+                            <li>• Base: 0(P) + 3(P+OT) + 4(paid offs) = 7</li>
+                            <li>• Overtime: 0(OT) + 3(P+OT overtime) = 3</li>
+                            <li>• Unused offs: max(0, 4-4) = 0</li>
+                            <li>• <strong>Total: 7 + 3 + 0 - 1(absent) = 9 days</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- After Fix -->
+                <div class="border rounded-lg p-4 bg-green-50">
+                    <h3 class="font-semibold text-green-600 mb-2">After Fix - Consistent Results</h3>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-medium text-gray-700">Both Use Same Logic:</h4>
+                        <ul class="text-sm space-y-1 mt-2">
+                            <li>• Present days: 0</li>
+                            <li>• P+OT days: 3</li>
+                            <li>• Off days: 4</li>
+                            <li>• Absent days: 1</li>
+                            <li>• OT only: 0</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-700">Calculation:</h4>
+                        <ul class="text-sm space-y-1 mt-2">
+                            <li>• Base: 0(P) + 3(P+OT) + 4(paid offs) = 7</li>
+                            <li>• Overtime: 0(OT) + 3(P+OT overtime) = 3</li>
+                            <li>• Unused offs: max(0, 4-4) = 0</li>
+                            <li>• <strong>Both show: 7 + 3 + 0 - 1 = 9 days</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Calculator -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Test Calculator</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Present (P)</label>
+                    <input type="number" id="presentDays" value="0" min="0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">P+OT</label>
+                    <input type="number" id="potDays" value="3" min="0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Off Days</label>
+                    <input type="number" id="offDays" value="4" min="0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Absent (A)</label>
+                    <input type="number" id="absentDays" value="1" min="0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">OT Only</label>
+                    <input type="number" id="otDays" value="0" min="0" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+            </div>
+            
+            <button onclick="calculate()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Calculate Working Days
+            </button>
+            
+            <div id="result" class="mt-6 p-4 bg-gray-50 rounded-lg hidden">
+                <h3 class="font-semibold mb-2">Calculation Result:</h3>
+                <div id="breakdown"></div>
+            </div>
+        </div>
+        
+        <!-- Back Button -->
+        <div class="mt-8 text-center">
+            <a href="index.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Payroll System
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        function calculate() {
+            const presentDays = parseInt(document.getElementById('presentDays').value) || 0;
+            const potDays = parseInt(document.getElementById('potDays').value) || 0;
+            const offDays = parseInt(document.getElementById('offDays').value) || 0;
+            const absentDays = parseInt(document.getElementById('absentDays').value) || 0;
+            const otDays = parseInt(document.getElementById('otDays').value) || 0;
+            
+            // Hospital calculation logic
+            const paidOffDays = Math.min(offDays, 4);
+            const basePresentDays = presentDays + potDays + paidOffDays;
+            const totalOvertimeDays = otDays + potDays;
+            const unusedPaidOffs = Math.max(0, 4 - offDays);
+            const workingDays = basePresentDays < 1 ? 0 : (basePresentDays + totalOvertimeDays + unusedPaidOffs - absentDays);
+            
+            const resultDiv = document.getElementById('result');
+            const breakdownDiv = document.getElementById('breakdown');
+            
+            breakdownDiv.innerHTML = `
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span>Base Present Days:</span>
+                        <span>${presentDays} (P) + ${potDays} (P+OT) + ${paidOffDays} (paid offs) = ${basePresentDays}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Overtime Days:</span>
+                        <span>${otDays} (OT) + ${potDays} (P+OT overtime) = ${totalOvertimeDays}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Unused Paid Offs:</span>
+                        <span>max(0, 4 - ${offDays}) = ${unusedPaidOffs}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Absent Days:</span>
+                        <span>-${absentDays}</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="flex justify-between font-bold text-lg">
+                        <span>Total Working Days:</span>
+                        <span class="text-green-600">${workingDays}</span>
+                    </div>
+                    ${offDays > 4 ? `<div class="text-red-600 text-sm">⚠️ ${offDays - 4} offs are unpaid</div>` : ''}
+                </div>
+            `;
+            
+            resultDiv.classList.remove('hidden');
+        }
+        
+        // Calculate on page load
+        calculate();
+    </script>
+</body>
+</html>

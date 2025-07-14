@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Master Report PDF Generator</title>
+    
+    <!-- External CDN Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Master Report PDF Test</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Test Data Summary</h2>
+            <p id="data-summary" class="text-gray-600"></p>
+        </div>
+        
+        <button onclick="generateTestReport()" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg">
+            <i class="fas fa-crown mr-2"></i>Generate Enhanced Master Report PDF
+        </button>
+        
+        <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">✨ Enhanced Features</h3>
+            <ul class="text-sm text-blue-700 space-y-1">
+                <li>• Modern attendance visualization with performance bars</li>
+                <li>• Enhanced typography with monospace fonts for numbers</li>
+                <li>• Subtle gradients and box shadows throughout</li>
+                <li>• Better spacing and visual dividers between sections</li>
+                <li>• Vibrant, distinct color palette for charts</li>
+                <li>• Professional header and footer design</li>
+                <li>• Consistent alternating row colors in all tables</li>
+            </ul>
+        </div>
+        
+        <div id="log" class="mt-8 bg-gray-800 text-green-400 p-4 rounded-lg font-mono text-sm max-h-96 overflow-y-auto"></div>
+    </div>
+
+    <script>
+        // Mock data
+        const employees = [];
+        const payrollData = [];
+        const attendance = {};
+        const activities = [];
+        const currentMonth = '2025-06';
+
+        // Generate test data
+        function generateTestData() {
+            const departments = ['IT', 'HR', 'Accounts', 'Sales', 'Marketin']; // Note: Marketin to test cleaning
+            const designations = ['Manager', 'Executive', 'Senior Executive', 'Team Lead', 'Director'];
+            const names = [
+                'Rajesh Kumar', 'Priya Sharma', 'Amit Patel', 'Sunita Reddy', 'Vikram Singh',
+                'Anita Desai', 'Suresh Iyer', 'Kavita Mehta', 'Ramesh Gupta', 'Deepa Nair',
+                'Arjun Nair', 'Sneha Rao', 'Karthik Menon', 'Pooja Verma', 'Ravi Shankar'
+            ];
+
+            // Generate employees
+            for (let i = 1; i <= 25; i++) {
+                const basicSalary = Math.floor(Math.random() * 50000) + 25000;
+                const emp = {
+                    id: `EMP${String(i).padStart(3, '0')}`,
+                    name: names[i % names.length] + ' ' + Math.floor(i / names.length + 1),
+                    department: departments[i % departments.length],
+                    designation: designations[i % designations.length],
+                    bankAccount: `${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+                    ifsc: ['SBIN0001234', 'HDFC0001234', 'ICIC0001234', 'AXIS0001234'][i % 4],
+                    basicSalary: basicSalary,
+                    status: 'Active'
+                };
+                employees.push(emp);
+
+                // Generate payroll data
+                const hra = basicSalary * 0.40;
+                const conveyance = 1600;
+                const otherAllowances = Math.floor(Math.random() * 5000);
+                const nightHoursAmount = Math.floor(Math.random() * 10000);
+                const grossSalary = basicSalary + hra + conveyance + otherAllowances + nightHoursAmount;
+                
+                const pf = basicSalary * 0.12;
+                const esic = grossSalary < 21000 ? grossSalary * 0.0075 : 0;
+                const pt = grossSalary > 15000 ? 200 : 0;
+                const advance = i % 5 === 0 ? Math.floor(Math.random() * 5000) + 1000 : 0;
+                const totalDeductions = pf + esic + pt + advance;
+                const netPay = grossSalary - totalDeductions;
+
+                payrollData.push({
+                    ...emp,
+                    hra,
+                    conveyance,
+                    otherAllowances,
+                    nightHoursAmount,
+                    grossSalary,
+                    pf,
+                    esic,
+                    pt,
+                    advance,
+                    totalDeductions,
+                    netPay,
+                    presentDays: Math.floor(Math.random() * 5) + 23,
+                    absentDays: Math.floor(Math.random() * 3),
+                    nightHours: Math.floor(Math.random() * 50)
+                });
+            }
+
+            // Generate attendance data
+            attendance[currentMonth] = {};
+            employees.forEach(emp => {
+                attendance[currentMonth][emp.id] = {};
+                for (let day = 1; day <= 30; day++) {
+                    const rand = Math.random();
+                    if (rand < 0.85) {
+                        attendance[currentMonth][emp.id][day] = 'P';
+                    } else if (rand < 0.90) {
+                        attendance[currentMonth][emp.id][day] = 'A';
+                    } else if (rand < 0.95) {
+                        attendance[currentMonth][emp.id][day] = 'NH';
+                    } else {
+                        attendance[currentMonth][emp.id][day] = 'Off';
+                    }
+                }
+            });
+
+            // Update summary
+            document.getElementById('data-summary').innerHTML = `
+                <strong>Employees:</strong> ${employees.length}<br>
+                <strong>Departments:</strong> ${[...new Set(employees.map(e => e.department))].join(', ')}<br>
+                <strong>Total Gross Payroll:</strong> ₹${payrollData.reduce((sum, emp) => sum + emp.grossSalary, 0).toLocaleString('en-IN')}<br>
+                <strong>Total Net Payroll:</strong> ₹${payrollData.reduce((sum, emp) => sum + emp.netPay, 0).toLocaleString('en-IN')}
+            `;
+
+            log('Test data generated successfully');
+        }
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function addActivity(message) {
+            activities.push({
+                message: message,
+                timestamp: new Date().toISOString()
+            });
+            log(`Activity: ${message}`);
+        }
+
+        // Generate test data on load
+        generateTestData();
+    </script>
+
+    <!-- Include the Master Report generator -->
+    <script src="src/scripts/reports/master-report-pdf.js"></script>
+
+    <script>
+        async function generateTestReport() {
+            log('Starting Master Report generation...');
+            
+            try {
+                await generateMasterReportPDF();
+                log('Master Report generation completed!');
+            } catch (error) {
+                log(`Error: ${error.message}`);
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

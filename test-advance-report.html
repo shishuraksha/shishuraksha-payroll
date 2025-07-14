@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advance Report Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <h1>Advance Report Test</h1>
+    
+    <button onclick="testReport()">Test Report Generation</button>
+    <button onclick="testExport()">Test Excel Export</button>
+    
+    <div id="results"></div>
+
+    <script>
+        // Mock data for testing
+        let employees = [
+            {id: 'EMP001', name: 'John Doe', department: 'IT', status: 'Active'},
+            {id: 'EMP002', name: 'Jane Smith', department: 'HR', status: 'Active'}
+        ];
+        
+        let currentMonth = '2025-06';
+        
+        // Mock advance loans data
+        const mockAdvanceLoans = {
+            'EMP001': [
+                {
+                    id: '1',
+                    employeeId: 'EMP001',
+                    totalAmount: 10000,
+                    emiAmount: 2000,
+                    emiMonths: 5,
+                    remainingAmount: 6000,
+                    remainingMonths: 3,
+                    status: 'active',
+                    startMonth: '2025-05',
+                    history: [
+                        { month: '2025-05', amount: 2000, remainingAfter: 8000, type: 'regular' },
+                        { month: '2025-06', amount: 2000, remainingAfter: 6000, type: 'regular' }
+                    ]
+                }
+            ],
+            'EMP002': [
+                {
+                    id: '2',
+                    employeeId: 'EMP002',
+                    totalAmount: 5000,
+                    emiAmount: 1000,
+                    emiMonths: 5,
+                    remainingAmount: 3000,
+                    remainingMonths: 3,
+                    status: 'active',
+                    startMonth: '2025-06',
+                    history: [
+                        { month: '2025-06', amount: 1000, remainingAfter: 4000, type: 'regular' }
+                    ]
+                }
+            ]
+        };
+        
+        // Store mock data in localStorage
+        localStorage.setItem('payroll_advanceLoans', JSON.stringify(mockAdvanceLoans));
+        
+        // Include the advance reports script
+    </script>
+    
+    <script src="public/js/reports/advance-reports.js"></script>
+    
+    <script>
+        function testReport() {
+            try {
+                const report = generateAdvanceReport();
+                document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(report, null, 2) + '</pre>';
+                console.log('Report generated successfully:', report);
+            } catch (error) {
+                console.error('Error generating report:', error);
+                document.getElementById('results').innerHTML = '<p style="color: red;">Error: ' + error.message + '</p>';
+            }
+        }
+        
+        function testExport() {
+            try {
+                quickExportAdvanceExcel();
+            } catch (error) {
+                console.error('Error exporting:', error);
+                alert('Export error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Report Functions</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <h1>Debug Report Functions</h1>
+    <button onclick="testShowPayslipSelector()">Test Generate Payslips</button>
+    <button onclick="testGenerateBankStatement()">Test Bank Statement</button>
+    <button onclick="testGenerateComprehensiveReport()">Test Comprehensive Report</button>
+    
+    <script>
+        // Mock global variables
+        let employees = [
+            {id: 'EMP001', name: 'Test Employee', department: 'IT', status: 'Active', basicSalary: 50000}
+        ];
+        let payrollData = [
+            {id: 'EMP001', name: 'Test Employee', department: 'IT', grossSalary: 60000, netPay: 50000, totalDeductions: 10000}
+        ];
+        let attendance = {};
+        let currentMonth = '2025-06';
+        let activities = [];
+        
+        // Mock functions
+        function addActivity(msg) { console.log('Activity:', msg); }
+        function saveToLocalStorage() { console.log('Saved to localStorage'); }
+        function switchTab(tab) { console.log('Switch to tab:', tab); }
+        function processPayroll(notify) { console.log('Process payroll called'); return true; }
+        
+        // Test functions
+        function testShowPayslipSelector() {
+            console.log('Testing showPayslipSelector...');
+            try {
+                showPayslipSelector();
+            } catch (error) {
+                console.error('Error in showPayslipSelector:', error);
+            }
+        }
+        
+        function testGenerateBankStatement() {
+            console.log('Testing generateBankStatement...');
+            try {
+                generateBankStatement();
+            } catch (error) {
+                console.error('Error in generateBankStatement:', error);
+            }
+        }
+        
+        function testGenerateComprehensiveReport() {
+            console.log('Testing generateComprehensiveReport...');
+            try {
+                generateComprehensiveReport();
+            } catch (error) {
+                console.error('Error in generateComprehensiveReport:', error);
+            }
+        }
+    </script>
+    
+    <!-- Load the actual PDF reports module -->
+    <script src="src/scripts/modules/pdf-reports.js"></script>
+</body>
+</html>

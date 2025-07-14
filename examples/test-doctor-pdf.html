@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Doctor PDF Generation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <h1>Doctor PDF Generation Test</h1>
+    <button onclick="testPDF()">Test Basic PDF</button>
+    <button onclick="testDoctorPayslip()">Test Doctor Payslip</button>
+    <button onclick="checkGlobals()">Check Global Variables</button>
+    
+    <script>
+        // Mock global variables
+        let currentMonth = '2025-06';
+        let doctors = [];
+        let doctorAttendance = {};
+        let doctorPayroll = {};
+        let activities = [];
+        
+        const SHIFT_TYPES = {
+            'morning': { name: 'Morning (8AM-4PM)', hours: 8 },
+            'evening': { name: 'Evening (4PM-12AM)', hours: 8 },
+            'night': { name: 'Night (12AM-8AM)', hours: 8 },
+            'day12': { name: 'Day 12hr (8AM-8PM)', hours: 12 },
+            'night12': { name: 'Night 12hr (8PM-8AM)', hours: 12 },
+            'full24': { name: 'Full 24hr', hours: 24 }
+        };
+        
+        const SPECIALIZATIONS = {
+            'pediatrics': { name: 'Pediatrics', baseRate: 2500 },
+            'cardiology': { name: 'Cardiology', baseRate: 3500 }
+        };
+        
+        function addActivity(message) {
+            console.log('Activity:', message);
+            activities.push({ message, timestamp: new Date() });
+        }
+        
+        function closeDoctorModal() {
+            console.log('Modal closed');
+        }
+        
+        function testPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text('Hello World!', 10, 10);
+            doc.save('test.pdf');
+            console.log('Basic PDF generated successfully');
+        }
+        
+        function checkGlobals() {
+            console.log('Checking global variables:');
+            console.log('window.jspdf:', window.jspdf);
+            console.log('window.jsPDF:', window.jsPDF);
+            console.log('currentMonth:', currentMonth);
+            console.log('doctors:', doctors);
+            console.log('doctorPayroll:', doctorPayroll);
+            console.log('doctorAttendance:', doctorAttendance);
+            console.log('SHIFT_TYPES:', SHIFT_TYPES);
+            console.log('SPECIALIZATIONS:', SPECIALIZATIONS);
+        }
+        
+        function testDoctorPayslip() {
+            // Add test doctor
+            doctors = [{
+                id: 'DOC001',
+                name: 'Dr. Test Doctor',
+                specialization: 'pediatrics',
+                department: 'Pediatrics',
+                registrationNo: 'MH123456',
+                experience: 10,
+                hourlyRate: 2500,
+                status: 'Active'
+            }];
+            
+            // Add test payroll data
+            doctorPayroll[currentMonth] = {
+                'DOC001': {
+                    doctorId: 'DOC001',
+                    doctorName: 'Dr. Test Doctor',
+                    specialization: 'pediatrics',
+                    month: currentMonth,
+                    workingDays: 20,
+                    totalHours: 160,
+                    regularHours: 160,
+                    overtimeHours: 10,
+                    hourlyRate: 2500,
+                    regularPay: 400000,
+                    overtimePay: 37500,
+                    grossPay: 437500,
+                    tdsAmount: 43750,
+                    netPay: 393750
+                }
+            };
+            
+            // Load the doctor PDF reports script
+            const script = document.createElement('script');
+            script.src = 'scripts/doctors-pdf-reports.js';
+            script.onload = function() {
+                console.log('Script loaded, calling generateDoctorPayslip');
+                if (typeof generateDoctorPayslip === 'function') {
+                    generateDoctorPayslip('DOC001');
+                } else {
+                    console.error('generateDoctorPayslip function not found');
+                }
+            };
+            document.body.appendChild(script);
+        }
+    </script>
+</body>
+</html>

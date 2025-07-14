@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll Debug Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Payroll Debug Test</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Debug Information</h2>
+            <div class="space-y-2">
+                <div>
+                    <strong>Check Browser Console:</strong> Open Developer Tools (F12) → Console to see debug messages
+                </div>
+                <div>
+                    <strong>Expected behavior:</strong> When you click "Process Payroll" in the main system, you should see:
+                    <ul class="list-disc list-inside ml-4 mt-2">
+                        <li>processPayroll called, employees length: [number]</li>
+                        <li>Processing employee: [name] [id] (for each employee)</li>
+                        <li>displayPayroll called, payrollData length: [number]</li>
+                        <li>Processing payrollData: [array of objects]</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Troubleshooting Steps</h2>
+            <ol class="list-decimal list-inside space-y-2">
+                <li>
+                    <strong>Check if employees exist:</strong>
+                    <br>Open Console and type: <code class="bg-gray-100 px-2 py-1 rounded">console.log('employees:', employees)</code>
+                </li>
+                <li>
+                    <strong>Check if payrollData exists:</strong>
+                    <br>Open Console and type: <code class="bg-gray-100 px-2 py-1 rounded">console.log('payrollData:', payrollData)</code>
+                </li>
+                <li>
+                    <strong>Check if payroll table exists:</strong>
+                    <br>Open Console and type: <code class="bg-gray-100 px-2 py-1 rounded">console.log('tbody:', document.getElementById('payrollTableBody'))</code>
+                </li>
+                <li>
+                    <strong>Manually trigger payroll processing:</strong>
+                    <br>Open Console and type: <code class="bg-gray-100 px-2 py-1 rounded">processPayroll()</code>
+                </li>
+            </ol>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <a href="index.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                Back to Main System
+            </a>
+        </div>
+    </div>
+</body>
+</html>

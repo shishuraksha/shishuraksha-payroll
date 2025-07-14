@@ -1,0 +1,134 @@
+{
+  "sheetName": "Employee Master",
+  "headers": [
+    "Emp ID",
+    "Name",
+    "DOJ",
+    "Designation",
+    "Department",
+    "PF No",
+    "ESIC No",
+    "PAN",
+    "UAN",
+    "Bank Name",
+    "IFSC",
+    "A/c No",
+    "Basic",
+    "HRA",
+    "CA",
+    "Others",
+    "Total",
+    "PT Applicable",
+    "Status",
+    "Column 20",
+    "Column 21"
+  ],
+  "formulasByColumn": {
+    "Total": [
+      {
+        "cell": "Q2",
+        "formula": "SUM(M2:P2)",
+        "value": 20000
+      },
+      {
+        "cell": "Q3",
+        "formula": "SUM(M3:P3)",
+        "value": 14000
+      },
+      {
+        "cell": "Q4",
+        "formula": "SUM(M4:P4)",
+        "value": 12000
+      },
+      {
+        "cell": "Q5",
+        "formula": "SUM(M5:P5)",
+        "value": 7000
+      },
+      {
+        "cell": "Q6",
+        "formula": "SUM(M6:P6)",
+        "value": 9500
+      },
+      {
+        "cell": "Q7",
+        "formula": "SUM(M7:P7)",
+        "value": 18000
+      },
+      {
+        "cell": "Q8",
+        "formula": "SUM(M8:P8)",
+        "value": 12000
+      },
+      {
+        "cell": "Q9",
+        "formula": "SUM(M9:P9)",
+        "value": 12000
+      },
+      {
+        "cell": "Q10",
+        "formula": "SUM(M10:P10)",
+        "value": 22000
+      },
+      {
+        "cell": "Q11",
+        "formula": "SUM(M11:P11)",
+        "value": 15000
+      }
+    ],
+    "Status": [
+      {
+        "cell": "S2",
+        "formula": "IF(OR(B2=\"\",E2=\"\",M2=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      },
+      {
+        "cell": "S3",
+        "formula": "IF(OR(B3=\"\",E3=\"\",M3=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      },
+      {
+        "cell": "S4",
+        "formula": "IF(OR(B4=\"\",E4=\"\",M4=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      },
+      {
+        "cell": "S5",
+        "formula": "IF(OR(B5=\"\",E5=\"\",M5=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      },
+      {
+        "cell": "S6",
+        "formula": "IF(OR(B6=\"\",E6=\"\",M6=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      },
+      {
+        "cell": "S7",
+        "formula": "IF(OR(B7=\"\",E7=\"\",M7=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      },
+      {
+        "cell": "S8",
+        "formula": "IF(OR(B8=\"\",E8=\"\",M8=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      },
+      {
+        "cell": "S9",
+        "formula": "IF(OR(B9=\"\",E9=\"\",M9=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      },
+      {
+        "cell": "S10",
+        "formula": "IF(OR(B10=\"\",E10=\"\",M10=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      },
+      {
+        "cell": "S11",
+        "formula": "IF(OR(B11=\"\",E11=\"\",M11=0),\"⚠️ INCOMPLETE\",\"✅ COMPLETE\")",
+        "value": "✅ COMPLETE"
+      }
+    ]
+  },
+  "attendanceFormulas": [],
+  "dailyRateCalculations": []
+}

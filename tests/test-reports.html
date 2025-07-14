@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Reports</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <h2>Test Report Functions</h2>
+    <p>Open browser console (F12) to see debug output</p>
+    
+    <button onclick="window.testGeneratePayslips()" style="padding: 10px; margin: 5px;">Test Generate Payslips</button><br>
+    <button onclick="window.testBankStatement()" style="padding: 10px; margin: 5px;">Test Bank Statement</button><br>
+    <button onclick="window.testDepartmentSummary()" style="padding: 10px; margin: 5px;">Test Department Summary</button><br>
+    
+    <script>
+        // Initialize global variables that the reports need
+        window.employees = [
+            {id: 'EMP001', name: 'John Doe', department: 'IT', status: 'Active', basicSalary: 50000, bankAccount: '1234567890', ifsc: 'HDFC0001234'},
+            {id: 'EMP002', name: 'Jane Smith', department: 'HR', status: 'Active', basicSalary: 45000, bankAccount: '0987654321', ifsc: 'SBIN0001234'}
+        ];
+        
+        window.payrollData = [
+            {
+                id: 'EMP001', name: 'John Doe', department: 'IT', 
+                workingDays: 22, basic: 50000, hra: 20000, conveyance: 1600, 
+                otherAllowances: 2000, overtimeAmount: 0, grossSalary: 73600,
+                pf: 6000, esic: 552, pt: 200, advance: 0, totalDeductions: 6752, netPay: 66848,
+                bankAccount: '1234567890', ifsc: 'HDFC0001234'
+            },
+            {
+                id: 'EMP002', name: 'Jane Smith', department: 'HR',
+                workingDays: 22, basic: 45000, hra: 18000, conveyance: 1600,
+                otherAllowances: 2000, overtimeAmount: 0, grossSalary: 66600,
+                pf: 5400, esic: 499, pt: 200, advance: 0, totalDeductions: 6099, netPay: 60501,
+                bankAccount: '0987654321', ifsc: 'SBIN0001234'
+            }
+        ];
+        
+        window.attendance = {};
+        window.currentMonth = '2025-06';
+        window.activities = [];
+        
+        // Mock helper functions
+        window.addActivity = function(msg) { console.log('Activity:', msg); };
+        window.saveToLocalStorage = function() { console.log('Saved to localStorage'); };
+        window.switchTab = function(tab) { console.log('Switch to tab:', tab); };
+        window.processPayroll = function(notify) { 
+            console.log('Process payroll called'); 
+            return true; 
+        };
+        
+        // Test functions
+        window.testGeneratePayslips = function() {
+            console.log('=== Testing Generate Payslips ===');
+            try {
+                if (typeof showPayslipSelector === 'function') {
+                    showPayslipSelector();
+                    console.log('showPayslipSelector executed successfully');
+                } else {
+                    console.error('showPayslipSelector function not found');
+                }
+            } catch (error) {
+                console.error('Error in showPayslipSelector:', error);
+            }
+        };
+        
+        window.testBankStatement = function() {
+            console.log('=== Testing Bank Statement ===');
+            try {
+                if (typeof generateBankStatement === 'function') {
+                    generateBankStatement();
+                    console.log('generateBankStatement executed successfully');
+                } else {
+                    console.error('generateBankStatement function not found');
+                }
+            } catch (error) {
+                console.error('Error in generateBankStatement:', error);
+            }
+        };
+        
+        window.testDepartmentSummary = function() {
+            console.log('=== Testing Department Summary ===');
+            try {
+                if (typeof generateDepartmentSummary === 'function') {
+                    generateDepartmentSummary();
+                    console.log('generateDepartmentSummary executed successfully');
+                } else {
+                    console.error('generateDepartmentSummary function not found');
+                }
+            } catch (error) {
+                console.error('Error in generateDepartmentSummary:', error);
+            }
+        };
+        
+        console.log('Test environment initialized');
+        console.log('Global variables set:', {
+            employees: window.employees?.length || 0,
+            payrollData: window.payrollData?.length || 0,
+            currentMonth: window.currentMonth
+        });
+    </script>
+    
+    <!-- Load the PDF reports module -->
+    <script src="src/scripts/modules/pdf-reports.js"></script>
+    
+    <script>
+        // Check if functions loaded
+        setTimeout(() => {
+            console.log('Functions available:', {
+                showPayslipSelector: typeof showPayslipSelector,
+                generateBankStatement: typeof generateBankStatement,
+                generateDepartmentSummary: typeof generateDepartmentSummary
+            });
+        }, 100);
+    </script>
+</body>
+</html>

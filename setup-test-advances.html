@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Test Advance Loans</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .success { color: green; font-weight: bold; }
+        .info { color: blue; }
+        button { padding: 15px 25px; margin: 10px; font-size: 16px; cursor: pointer; }
+        .result { background: #f5f5f5; padding: 15px; margin: 10px 0; border-left: 4px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Setup Test Advance Loans</h1>
+    <p>This will create test advance loan data for testing the export functionality.</p>
+    
+    <button onclick="setupTestData()">Setup Test Advance Loans</button>
+    <button onclick="clearData()">Clear All Data</button>
+    <button onclick="viewCurrentData()">View Current Data</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const className = type === 'success' ? 'success' : 'info';
+            results.innerHTML += `<div class="result ${className}">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+        }
+
+        function setupTestData() {
+            try {
+                const testAdvanceLoans = {
+                    'EMP001': [
+                        {
+                            id: '1721234567890',
+                            employeeId: 'EMP001',
+                            totalAmount: 50000,
+                            emiAmount: 10000,
+                            emiMonths: 5,
+                            remainingAmount: 30000,
+                            remainingMonths: 3,
+                            status: 'active',
+                            startMonth: '2025-04',
+                            createdDate: '2025-04-01T00:00:00.000Z',
+                            history: [
+                                { month: '2025-04', amount: 10000, date: '2025-04-30T00:00:00.000Z', remainingAfter: 40000, type: 'regular' },
+                                { month: '2025-05', amount: 10000, date: '2025-05-31T00:00:00.000Z', remainingAfter: 30000, type: 'regular' }
+                            ]
+                        }
+                    ],
+                    'EMP002': [
+                        {
+                            id: '1721234567891',
+                            employeeId: 'EMP002',
+                            totalAmount: 75000,
+                            emiAmount: 15000,
+                            emiMonths: 5,
+                            remainingAmount: 60000,
+                            remainingMonths: 4,
+                            status: 'active',
+                            startMonth: '2025-05',
+                            createdDate: '2025-05-01T00:00:00.000Z',
+                            history: [
+                                { month: '2025-05', amount: 15000, date: '2025-05-31T00:00:00.000Z', remainingAfter: 60000, type: 'regular' }
+                            ]
+                        }
+                    ],
+                    'EMP003': [
+                        {
+                            id: '1721234567892',
+                            employeeId: 'EMP003',
+                            totalAmount: 25000,
+                            emiAmount: 5000,
+                            emiMonths: 5,
+                            remainingAmount: 20000,
+                            remainingMonths: 4,
+                            status: 'active',
+                            startMonth: '2025-06',
+                            createdDate: '2025-06-01T00:00:00.000Z',
+                            history: [
+                                { month: '2025-06', amount: 5000, date: '2025-06-30T00:00:00.000Z', remainingAfter: 20000, type: 'regular' }
+                            ]
+                        }
+                    ],
+                    'EMP004': [
+                        {
+                            id: '1721234567893',
+                            employeeId: 'EMP004',
+                            totalAmount: 40000,
+                            emiAmount: 8000,
+                            emiMonths: 5,
+                            remainingAmount: 0,
+                            remainingMonths: 0,
+                            status: 'completed',
+                            startMonth: '2025-01',
+                            createdDate: '2025-01-01T00:00:00.000Z',
+                            completedDate: '2025-05-31T00:00:00.000Z',
+                            history: [
+                                { month: '2025-01', amount: 8000, date: '2025-01-31T00:00:00.000Z', remainingAfter: 32000, type: 'regular' },
+                                { month: '2025-02', amount: 8000, date: '2025-02-28T00:00:00.000Z', remainingAfter: 24000, type: 'regular' },
+                                { month: '2025-03', amount: 8000, date: '2025-03-31T00:00:00.000Z', remainingAfter: 16000, type: 'regular' },
+                                { month: '2025-04', amount: 8000, date: '2025-04-30T00:00:00.000Z', remainingAfter: 8000, type: 'regular' },
+                                { month: '2025-05', amount: 8000, date: '2025-05-31T00:00:00.000Z', remainingAfter: 0, type: 'regular' }
+                            ]
+                        }
+                    ]
+                };
+
+                localStorage.setItem('payroll_advanceLoans', JSON.stringify(testAdvanceLoans));
+                log('✅ Test advance loans data created successfully!', 'success');
+                log(`📊 Created loans for ${Object.keys(testAdvanceLoans).length} employees`, 'info');
+                
+                // Summary
+                let totalActive = 0;
+                let totalCompleted = 0;
+                Object.values(testAdvanceLoans).forEach(employeeLoans => {
+                    employeeLoans.forEach(loan => {
+                        if (loan.status === 'active') {
+                            totalActive += loan.remainingAmount;
+                        } else if (loan.status === 'completed') {
+                            totalCompleted += loan.totalAmount;
+                        }
+                    });
+                });
+                
+                log(`💰 Total active amount: ₹${totalActive.toLocaleString('en-IN')}`, 'info');
+                log(`✅ Total completed amount: ₹${totalCompleted.toLocaleString('en-IN')}`, 'info');
+                
+                // Verify storage
+                const stored = localStorage.getItem('payroll_advanceLoans');
+                if (stored) {
+                    log('✅ Data successfully stored in localStorage', 'success');
+                } else {
+                    log('❌ Failed to store data in localStorage', 'error');
+                }
+
+            } catch (error) {
+                log(`❌ Error setting up test data: ${error.message}`, 'error');
+            }
+        }
+
+        function clearData() {
+            try {
+                localStorage.removeItem('payroll_advanceLoans');
+                log('🗑️ All advance loans data cleared', 'info');
+            } catch (error) {
+                log(`❌ Error clearing data: ${error.message}`, 'error');
+            }
+        }
+
+        function viewCurrentData() {
+            try {
+                const data = localStorage.getItem('payroll_advanceLoans');
+                if (!data) {
+                    log('📭 No advance loans data found in localStorage', 'info');
+                    return;
+                }
+                
+                const parsed = JSON.parse(data);
+                log(`📋 Current data for ${Object.keys(parsed).length} employees:`, 'info');
+                
+                Object.entries(parsed).forEach(([empId, loans]) => {
+                    const activeLoans = loans.filter(loan => loan.status === 'active');
+                    const completedLoans = loans.filter(loan => loan.status === 'completed');
+                    const totalActive = activeLoans.reduce((sum, loan) => sum + loan.remainingAmount, 0);
+                    
+                    log(`   ${empId}: ${activeLoans.length} active (₹${totalActive.toLocaleString('en-IN')}), ${completedLoans.length} completed`, 'info');
+                });
+                
+            } catch (error) {
+                log(`❌ Error viewing data: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-show current data on load
+        window.onload = function() {
+            log('🚀 Test setup page loaded', 'success');
+            viewCurrentData();
+        };
+    </script>
+</body>
+</html>

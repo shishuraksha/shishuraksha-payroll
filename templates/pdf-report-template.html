@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shishuraksha Children's Hospital - Payroll Report Template</title>
+    <link rel="stylesheet" href="pdf-styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Professional Header -->
+    <header class="report-header">
+        <div class="header-content">
+            <div class="hospital-branding">
+                <div class="logo-placeholder">
+                    <i class="fas fa-hospital-alt"></i>
+                </div>
+                <div class="hospital-info">
+                    <h1>SHISHURAKSHA CHILDREN'S HOSPITAL</h1>
+                    <p class="hospital-subtitle">Comprehensive Payroll Report</p>
+                </div>
+            </div>
+            <div class="report-meta">
+                <div class="meta-item">
+                    <span class="label">Report Period:</span>
+                    <span class="value" id="reportPeriod">June 2025</span>
+                </div>
+                <div class="meta-item">
+                    <span class="label">Generated:</span>
+                    <span class="value" id="generationDate">26 June 2025</span>
+                </div>
+                <div class="meta-item">
+                    <span class="label">Report ID:</span>
+                    <span class="value" id="reportId">SCH-PR-2025-06-001</span>
+                </div>
+            </div>
+        </div>
+        <div class="confidentiality-notice">
+            <i class="fas fa-shield-alt"></i>
+            <span>CONFIDENTIAL DOCUMENT - FOR AUTHORIZED PERSONNEL ONLY</span>
+        </div>
+    </header>
+
+    <!-- Executive Summary Section -->
+    <section class="report-section" id="executive-summary">
+        <div class="section-header">
+            <i class="fas fa-chart-line section-icon"></i>
+            <h2>📊 Executive Summary</h2>
+        </div>
+        
+        <div class="kpi-cards">
+            <div class="kpi-card primary">
+                <div class="kpi-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="kpi-content">
+                    <h3 id="totalEmployees">68</h3>
+                    <p>Total Employees</p>
+                    <div class="kpi-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+3 from last month</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kpi-card success">
+                <div class="kpi-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="kpi-content">
+                    <h3 id="grossPayroll">₹35,87,692</h3>
+                    <p>Gross Payroll</p>
+                    <div class="kpi-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+12.5% YoY</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kpi-card info">
+                <div class="kpi-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div class="kpi-content">
+                    <h3 id="netPayroll">₹34,34,787</h3>
+                    <p>Net Payroll</p>
+                    <div class="kpi-savings">
+                        <i class="fas fa-piggy-bank"></i>
+                        <span>₹1,52,905 in deductions</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kpi-card warning">
+                <div class="kpi-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <div class="kpi-content">
+                    <h3 id="averageSalary">₹50,512</h3>
+                    <p>Average Salary</p>
+                    <div class="kpi-benchmark">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Above industry avg</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-insights">
+            <div class="insights-content">
+                <h3>Key Insights</h3>
+                <ul>
+                    <li><strong>Department Distribution:</strong> IT (25%), Medical (35%), Administration (20%), Support (20%)</li>
+                    <li><strong>Attendance Rate:</strong> 96.5% overall attendance for June 2025</li>
+                    <li><strong>Compliance Status:</strong> All PF, ESIC, and PT deductions processed correctly</li>
+                    <li><strong>Cost Analysis:</strong> Total deductions represent 4.3% of gross payroll</li>
+                </ul>
+            </div>
+            <div class="chart-placeholder">
+                <canvas id="departmentChart" width="300" height="200"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Employee Payroll Details Section -->
+    <section class="report-section" id="employee-details">
+        <div class="section-header">
+            <i class="fas fa-users section-icon"></i>
+            <h2>👥 Employee Payroll Details</h2>
+        </div>
+        
+        <div class="table-container">
+            <table class="payroll-table">
+                <thead>
+                    <tr>
+                        <th>Emp ID</th>
+                        <th>Employee Name</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Basic Salary</th>
+                        <th>Allowances</th>
+                        <th>Gross Salary</th>
+                        <th>PF</th>
+                        <th>ESIC</th>
+                        <th>PT</th>
+                        <th>Advance</th>
+                        <th>Net Pay</th>
+                    </tr>
+                </thead>
+                <tbody id="employeePayrollData">
+                    <!-- Employee data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Department Analysis Section -->
+    <section class="report-section" id="department-analysis">
+        <div class="section-header">
+            <i class="fas fa-building section-icon"></i>
+            <h2>🏢 Department Analysis</h2>
+        </div>
+        
+        <div class="department-grid">
+            <div class="department-card">
+                <h3>Information Technology</h3>
+                <div class="dept-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Employees:</span>
+                        <span class="stat-value">17</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Gross:</span>
+                        <span class="stat-value">₹12,45,000</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Avg Salary:</span>
+                        <span class="stat-value">₹73,235</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="department-card">
+                <h3>Medical Staff</h3>
+                <div class="dept-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Employees:</span>
+                        <span class="stat-value">24</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Gross:</span>
+                        <span class="stat-value">₹15,78,000</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Avg Salary:</span>
+                        <span class="stat-value">₹65,750</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="department-card">
+                <h3>Administration</h3>
+                <div class="dept-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Employees:</span>
+                        <span class="stat-value">14</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Gross:</span>
+                        <span class="stat-value">₹4,23,000</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Avg Salary:</span>
+                        <span class="stat-value">₹30,214</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="department-card">
+                <h3>Support Services</h3>
+                <div class="dept-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Employees:</span>
+                        <span class="stat-value">13</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Gross:</span>
+                        <span class="stat-value">₹3,41,692</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Avg Salary:</span>
+                        <span class="stat-value">₹26,284</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Attendance Summary Section -->
+    <section class="report-section" id="attendance-summary">
+        <div class="section-header">
+            <i class="fas fa-calendar-check section-icon"></i>
+            <h2>📅 Attendance Summary</h2>
+        </div>
+        
+        <div class="attendance-overview">
+            <div class="attendance-stats">
+                <div class="attendance-metric">
+                    <h3>96.5%</h3>
+                    <p>Overall Attendance Rate</p>
+                </div>
+                <div class="attendance-metric">
+                    <h3>22.3</h3>
+                    <p>Average Working Days</p>
+                </div>
+                <div class="attendance-metric">
+                    <h3>4</h3>
+                    <p>Total Holidays</p>
+                </div>
+                <div class="attendance-metric">
+                    <h3>158</h3>
+                    <p>Total Overtime Hours</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Total Employees</th>
+                        <th>Present Days</th>
+                        <th>Absent Days</th>
+                        <th>Overtime Hours</th>
+                        <th>Attendance %</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceData">
+                    <!-- Attendance data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Bank Transfer Details Section -->
+    <section class="report-section" id="bank-transfers">
+        <div class="section-header">
+            <i class="fas fa-university section-icon"></i>
+            <h2>💰 Bank Transfer Details</h2>
+        </div>
+        
+        <div class="bank-summary">
+            <div class="bank-stat">
+                <h3>₹34,34,787</h3>
+                <p>Total Transfer Amount</p>
+            </div>
+            <div class="bank-stat">
+                <h3>68</h3>
+                <p>Total Transfers</p>
+            </div>
+            <div class="bank-stat">
+                <h3>12</h3>
+                <p>Participating Banks</p>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table class="bank-table">
+                <thead>
+                    <tr>
+                        <th>Emp ID</th>
+                        <th>Employee Name</th>
+                        <th>Bank Account</th>
+                        <th>IFSC Code</th>
+                        <th>Bank Name</th>
+                        <th>Net Amount</th>
+                        <th>Transfer Status</th>
+                    </tr>
+                </thead>
+                <tbody id="bankTransferData">
+                    <!-- Bank transfer data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Compliance Report Section -->
+    <section class="report-section" id="compliance-report">
+        <div class="section-header">
+            <i class="fas fa-check-circle section-icon"></i>
+            <h2>✅ Compliance Report</h2>
+        </div>
+        
+        <div class="compliance-overview">
+            <div class="compliance-cards">
+                <div class="compliance-card pf">
+                    <h3>Provident Fund (PF)</h3>
+                    <div class="compliance-details">
+                        <p><strong>Total PF Deduction:</strong> ₹86,324</p>
+                        <p><strong>Employer Contribution:</strong> ₹86,324</p>
+                        <p><strong>Employees Covered:</strong> 64/68</p>
+                        <p><strong>Status:</strong> <span class="status-success">Compliant</span></p>
+                    </div>
+                </div>
+                
+                <div class="compliance-card esic">
+                    <h3>ESIC</h3>
+                    <div class="compliance-details">
+                        <p><strong>Employee Contribution:</strong> ₹21,581</p>
+                        <p><strong>Employer Contribution:</strong> ₹75,533</p>
+                        <p><strong>Employees Covered:</strong> 68/68</p>
+                        <p><strong>Status:</strong> <span class="status-success">Compliant</span></p>
+                    </div>
+                </div>
+                
+                <div class="compliance-card pt">
+                    <h3>Professional Tax (PT)</h3>
+                    <div class="compliance-details">
+                        <p><strong>Total PT Deduction:</strong> ₹45,000</p>
+                        <p><strong>Employees Liable:</strong> 58/68</p>
+                        <p><strong>Exempted:</strong> 10 (Below threshold)</p>
+                        <p><strong>Status:</strong> <span class="status-success">Compliant</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="compliance-summary">
+            <h3>Monthly Compliance Summary</h3>
+            <table class="compliance-table">
+                <thead>
+                    <tr>
+                        <th>Compliance Type</th>
+                        <th>Due Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action Required</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>PF Return Filing</td>
+                        <td>15th July 2025</td>
+                        <td>₹1,72,648</td>
+                        <td><span class="status-pending">Pending</span></td>
+                        <td>File by due date</td>
+                    </tr>
+                    <tr>
+                        <td>ESIC Return</td>
+                        <td>21st July 2025</td>
+                        <td>₹97,114</td>
+                        <td><span class="status-pending">Pending</span></td>
+                        <td>File by due date</td>
+                    </tr>
+                    <tr>
+                        <td>PT Payment</td>
+                        <td>7th July 2025</td>
+                        <td>₹45,000</td>
+                        <td><span class="status-success">Completed</span></td>
+                        <td>None</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="report-footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <p><strong>Shishuraksha Children's Hospital</strong></p>
+                <p>Payroll Management System</p>
+            </div>
+            <div class="footer-center">
+                <p>This report contains confidential information and is intended for authorized personnel only.</p>
+            </div>
+            <div class="footer-right">
+                <p>Page <span class="page-number"></span></p>
+                <p id="footerDate">Generated: 26 June 2025</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Print-specific elements -->
+    <div class="print-header" style="display: none;">
+        <span>Shishuraksha Children's Hospital - Payroll Report</span>
+        <span class="print-page">Page <span class="page-number"></span></span>
+    </div>
+
+    <script src="pdf-data.js"></script>
+    <script src="pdf-generator.js"></script>
+</body>
+</html>

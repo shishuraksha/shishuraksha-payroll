@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Attendance Rules Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Hospital Attendance Rules Test Scenarios</h1>
+        
+        <!-- Test Scenarios -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Scenario 1: Normal attendance -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4 text-blue-600">
+                    <i class="fas fa-check-circle mr-2"></i>Scenario 1: Normal Attendance
+                </h2>
+                <p class="text-gray-600 mb-4">Employee with 3 offs (under limit)</p>
+                <table class="w-full text-sm">
+                    <tr class="border-b">
+                        <td class="py-2">Present Days (P):</td>
+                        <td class="font-semibold">20</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">P+OT Days:</td>
+                        <td class="font-semibold">2</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">Offs:</td>
+                        <td class="font-semibold">3</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">Absent:</td>
+                        <td class="font-semibold">1</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">OT Only:</td>
+                        <td class="font-semibold">4</td>
+                    </tr>
+                    <tr class="bg-green-50">
+                        <td class="py-2 font-bold">Total Working Days:</td>
+                        <td class="font-bold text-green-600">
+                            20 + 2 + 3 + 4 + 2(P+OT extra) + 1(unused off) - 1(absent) = 31 days
+                        </td>
+                    </tr>
+                </table>
+                <div class="mt-4 p-3 bg-blue-50 rounded text-sm">
+                    <p class="font-semibold">Calculation Breakdown:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li>Base days: 20(P) + 2(P+OT) + 3(paid offs) = 25</li>
+                        <li>Overtime days: 4(OT) + 2(P+OT overtime portion) = 6</li>
+                        <li>Unused offs: 4 - 3 = 1 paid day</li>
+                        <li>Total: 25 + 6 + 1 - 1(absent) = 31 days</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Scenario 2: Exceeded offs -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4 text-red-600">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Scenario 2: Exceeded Offs
+                </h2>
+                <p class="text-gray-600 mb-4">Employee with 6 offs (exceeds 4 limit)</p>
+                <table class="w-full text-sm">
+                    <tr class="border-b">
+                        <td class="py-2">Present Days (P):</td>
+                        <td class="font-semibold">18</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">P+OT Days:</td>
+                        <td class="font-semibold">1</td>
+                    </tr>
+                    <tr class="border-b bg-red-50">
+                        <td class="py-2">Offs:</td>
+                        <td class="font-semibold text-red-600">6 (2 unpaid)</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">Absent:</td>
+                        <td class="font-semibold">2</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">OT Only:</td>
+                        <td class="font-semibold">3</td>
+                    </tr>
+                    <tr class="bg-yellow-50">
+                        <td class="py-2 font-bold">Total Working Days:</td>
+                        <td class="font-bold text-yellow-700">
+                            18 + 1 + 4(paid offs) + 3 + 1(P+OT extra) + 0(no unused) - 2(absent) = 25 days
+                        </td>
+                    </tr>
+                </table>
+                <div class="mt-4 p-3 bg-red-50 rounded text-sm">
+                    <p class="font-semibold">Warning:</p>
+                    <p>Employee has taken 6 offs but only 4 are paid. The extra 2 offs are unpaid leave.</p>
+                </div>
+            </div>
+
+            <!-- Scenario 3: P+OT Heavy -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4 text-purple-600">
+                    <i class="fas fa-clock mr-2"></i>Scenario 3: P+OT Heavy Month
+                </h2>
+                <p class="text-gray-600 mb-4">Employee with multiple P+OT days</p>
+                <table class="w-full text-sm">
+                    <tr class="border-b">
+                        <td class="py-2">Present Days (P):</td>
+                        <td class="font-semibold">15</td>
+                    </tr>
+                    <tr class="border-b bg-purple-50">
+                        <td class="py-2">P+OT Days:</td>
+                        <td class="font-semibold text-purple-600">8 (counts as 16 days pay)</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">Offs:</td>
+                        <td class="font-semibold">4</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">Absent:</td>
+                        <td class="font-semibold">0</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">OT Only:</td>
+                        <td class="font-semibold">3</td>
+                    </tr>
+                    <tr class="bg-purple-50">
+                        <td class="py-2 font-bold">Total Working Days:</td>
+                        <td class="font-bold text-purple-700">
+                            15 + 8 + 4 + 3 + 8(P+OT extra) + 0(no unused) - 0 = 38 days
+                        </td>
+                    </tr>
+                </table>
+                <div class="mt-4 p-3 bg-purple-50 rounded text-sm">
+                    <p class="font-semibold">Note:</p>
+                    <p>Each P+OT day provides 2 days of payment, making this a high-earning month due to overtime work.</p>
+                </div>
+            </div>
+
+            <!-- Scenario 4: Perfect attendance -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4 text-green-600">
+                    <i class="fas fa-star mr-2"></i>Scenario 4: Perfect Attendance
+                </h2>
+                <p class="text-gray-600 mb-4">Employee with no offs taken</p>
+                <table class="w-full text-sm">
+                    <tr class="border-b">
+                        <td class="py-2">Present Days (P):</td>
+                        <td class="font-semibold">26</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">P+OT Days:</td>
+                        <td class="font-semibold">0</td>
+                    </tr>
+                    <tr class="border-b bg-green-50">
+                        <td class="py-2">Offs:</td>
+                        <td class="font-semibold text-green-600">0 (4 unused)</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">Absent:</td>
+                        <td class="font-semibold">0</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">OT Only:</td>
+                        <td class="font-semibold">4</td>
+                    </tr>
+                    <tr class="bg-green-50">
+                        <td class="py-2 font-bold">Total Working Days:</td>
+                        <td class="font-bold text-green-600">
+                            26 + 0 + 0 + 4 + 0 + 4(all unused offs) - 0 = 34 days
+                        </td>
+                    </tr>
+                </table>
+                <div class="mt-4 p-3 bg-green-50 rounded text-sm">
+                    <p class="font-semibold">Bonus:</p>
+                    <p>Employee receives payment for all 4 unused offs, effectively getting paid for 34 days in a 30-day month!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary of Rules -->
+        <div class="mt-8 bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-4">Hospital 24-Hour Attendance Rules Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="border rounded-lg p-4">
+                    <h3 class="font-semibold text-blue-600 mb-2">
+                        <i class="fas fa-calendar-times mr-2"></i>Off Days Policy
+                    </h3>
+                    <ul class="text-sm space-y-1">
+                        <li>• Maximum 4 paid offs per month</li>
+                        <li>• Offs beyond 4 are unpaid</li>
+                        <li>• Unused offs are paid extra</li>
+                        <li>• System warns when exceeding 4 offs</li>
+                    </ul>
+                </div>
+                
+                <div class="border rounded-lg p-4">
+                    <h3 class="font-semibold text-purple-600 mb-2">
+                        <i class="fas fa-user-clock mr-2"></i>P+OT (Present + Overtime)
+                    </h3>
+                    <ul class="text-sm space-y-1">
+                        <li>• Counts as 2 days payment</li>
+                        <li>• 1 day regular + 1 day overtime</li>
+                        <li>• Common in 24-hour hospitals</li>
+                        <li>• Higher earnings for staff</li>
+                    </ul>
+                </div>
+                
+                <div class="border rounded-lg p-4">
+                    <h3 class="font-semibold text-green-600 mb-2">
+                        <i class="fas fa-calculator mr-2"></i>Payment Calculation
+                    </h3>
+                    <ul class="text-sm space-y-1">
+                        <li>• Base: P + P+OT + Paid Offs</li>
+                        <li>• Add: OT days + P+OT overtime</li>
+                        <li>• Add: Unused paid offs (4 - taken)</li>
+                        <li>• Subtract: Absent days</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Button -->
+        <div class="mt-8 text-center">
+            <a href="index.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Payroll System
+            </a>
+        </div>
+    </div>
+</body>
+</html>

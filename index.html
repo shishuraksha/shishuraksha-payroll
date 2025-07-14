@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shishuraksha Children's Hospital - Premium Payroll Management</title>
+    
+    <!-- External CDN Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Local Styles -->
+    <link href="public/css/main.css" rel="stylesheet">
+</head>
+<body class="min-h-screen">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl">
+            <div class="loading"></div>
+            <p class="mt-2 text-gray-700 dark:text-gray-300">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-morphism-strong sticky top-0 z-40">
+        <div class="w-full px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-hospital text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Shishuraksha Children's Hospital</h1>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Premium Payroll Management System</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <select id="monthSelector" onchange="changeMonth()" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                        <option value="2025-01">January 2025</option>
+                        <option value="2025-02">February 2025</option>
+                        <option value="2025-03">March 2025</option>
+                        <option value="2025-04">April 2025</option>
+                        <option value="2025-05">May 2025</option>
+                        <option value="2025-06" selected>June 2025</option>
+                        <option value="2025-07">July 2025</option>
+                        <option value="2025-08">August 2025</option>
+                        <option value="2025-09">September 2025</option>
+                        <option value="2025-10">October 2025</option>
+                        <option value="2025-11">November 2025</option>
+                        <option value="2025-12">December 2025</option>
+                    </select>
+                    
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <i id="darkModeIcon" class="fas fa-moon text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                    
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-bars text-gray-600 dark:text-gray-300"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="glass-morphism sticky top-20 z-30">
+        <div class="w-full px-4">
+            <div class="flex flex-wrap justify-center md:justify-start space-x-2 py-4" id="mainNavigation">
+                <button id="tab-dashboard" class="nav-tab active" onclick="switchTab('dashboard')">
+                    <i class="fas fa-chart-pie mr-2"></i>Dashboard
+                </button>
+                <button id="tab-employees" class="nav-tab" onclick="switchTab('employees')">
+                    <i class="fas fa-users mr-2"></i>Employees
+                </button>
+                <button id="tab-doctors" class="nav-tab" onclick="switchTab('doctors')">
+                    <i class="fas fa-user-md mr-2"></i>Doctors
+                </button>
+                <button id="tab-attendance" class="nav-tab" onclick="switchTab('attendance')">
+                    <i class="fas fa-calendar-check mr-2"></i>Attendance
+                </button>
+                <button id="tab-payroll" class="nav-tab" onclick="switchTab('payroll')">
+                    <i class="fas fa-calculator mr-2"></i>Payroll
+                </button>
+                <button id="tab-reports" class="nav-tab" onclick="switchTab('reports')">
+                    <i class="fas fa-file-alt mr-2"></i>Reports
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+            <div class="px-4 py-2 space-y-2">
+                <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" onclick="switchTab('dashboard')">
+                    <i class="fas fa-chart-pie mr-2"></i>Dashboard
+                </button>
+                <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" onclick="switchTab('employees')">
+                    <i class="fas fa-users mr-2"></i>Employees
+                </button>
+                <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" onclick="switchTab('doctors')">
+                    <i class="fas fa-user-md mr-2"></i>Doctors
+                </button>
+                <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" onclick="switchTab('attendance')">
+                    <i class="fas fa-calendar-check mr-2"></i>Attendance
+                </button>
+                <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" onclick="switchTab('payroll')">
+                    <i class="fas fa-calculator mr-2"></i>Payroll
+                </button>
+                <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded" onclick="switchTab('reports')">
+                    <i class="fas fa-file-alt mr-2"></i>Reports
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="w-full px-4 py-6">
+        <!-- Dashboard Tab -->
+        <div id="content-dashboard" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Stats Cards -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Total Employees</p>
+                            <p id="total-employees" class="text-3xl font-bold text-gray-800 dark:text-white">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="premium-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Gross Payroll</p>
+                            <p id="gross-payroll" class="text-3xl font-bold text-gray-800 dark:text-white">₹0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-money-bill-wave text-green-600 dark:text-green-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="premium-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Net Payroll</p>
+                            <p id="total-net-pay" class="text-3xl font-bold text-gray-800 dark:text-white">₹0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-hand-holding-usd text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="premium-card p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Total Deductions</p>
+                            <p id="total-deductions" class="text-3xl font-bold text-gray-800 dark:text-white">₹0</p>
+                            <p id="deduction-percentage" class="text-xs text-gray-500 dark:text-gray-400">0% of gross</p>
+                        </div>
+                        <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-minus-circle text-red-600 dark:text-red-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Recent Activities -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="premium-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Department Distribution</h3>
+                    <div class="h-64">
+                        <canvas id="departmentChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="premium-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Recent Activities</h3>
+                    <div id="recentActivities" class="space-y-3 h-64 overflow-y-auto">
+                        <!-- Activities will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employees Tab -->
+        <div id="content-employees" class="tab-content hidden">
+            <div class="premium-card p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-bold">Employee Management</h2>
+                    <div class="flex gap-2">
+                        <input type="text" id="employeeSearch" placeholder="Search employees..." 
+                               onkeyup="searchEmployees()" 
+                               class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        <button onclick="showAddEmployeeModal()" class="btn-premium">
+                            <i class="fas fa-plus mr-2"></i>Add Employee
+                        </button>
+                        <button onclick="showImportModal()" class="btn-premium" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                            <i class="fas fa-file-import mr-2"></i>Import Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="table-premium w-full">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Bank Account</th>
+                                <th>IFSC</th>
+                                <th>Basic Salary</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTableBody">
+                            <!-- Employee rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctors Tab -->
+        <div id="content-doctors" class="tab-content hidden">
+            <div class="premium-card p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-bold">Doctors Management</h2>
+                    <div class="flex gap-2">
+                        <input type="text" id="doctorSearch" placeholder="Search doctors..." 
+                               onkeyup="searchDoctors()" 
+                               class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        <button onclick="showAddDoctorModal()" class="btn-premium">
+                            <i class="fas fa-plus mr-2"></i>Add Doctor
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="table-premium w-full">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th>Department</th>
+                                <th>Registration No.</th>
+                                <th>Experience</th>
+                                <th>Hourly Rate</th>
+                                <th>Night Rate</th>
+                                <th>Professional Fee</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="doctorTableBody">
+                            <!-- Doctor rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Tab -->
+        <div id="content-attendance" class="tab-content hidden">
+            <div class="premium-card p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-bold">Attendance Management</h2>
+                    <div class="flex gap-2">
+                        <input type="text" id="attendanceSearch" placeholder="Search by name, ID, or department..." 
+                               onkeyup="searchAttendance()" 
+                               class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        <button onclick="highlightEmployee()" class="btn-premium">
+                            <i class="fas fa-search mr-2"></i>Find
+                        </button>
+                        <button onclick="markTodayAttendance()" class="btn-premium">
+                            <i class="fas fa-calendar-day mr-2"></i>Mark Today
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="attendance-table-container overflow-auto">
+                    <table class="table-premium w-full">
+                        <thead>
+                            <!-- Dynamic headers will be generated -->
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <!-- Attendance rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 space-y-2">
+                    <div class="flex flex-wrap gap-2">
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Legend:</div>
+                        <span class="attendance-cell attendance-P text-xs">P</span> Present
+                        <span class="attendance-cell attendance-A text-xs">A</span> Absent  
+                        <span class="attendance-cell attendance-Off text-xs">Off</span> Holiday
+                        <span class="attendance-cell attendance-OT text-xs">OT</span> Overtime
+                        <span class="attendance-cell attendance-POT text-xs">P+OT</span> Present + Overtime (2 days pay)
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-3 text-sm">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                            <div class="text-blue-700 dark:text-blue-300">
+                                <p class="font-semibold mb-1">Hospital 24-Hour Attendance Rules:</p>
+                                <ul class="list-disc list-inside space-y-1 text-xs">
+                                    <li>Maximum 4 paid offs allowed per month (additional offs are unpaid)</li>
+                                    <li>Unused offs are paid (e.g., 3 offs taken = 1 unused off paid)</li>
+                                    <li>P+OT counts as 2 days payment (regular + overtime)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payroll Tab -->
+        <div id="content-payroll" class="tab-content hidden">
+            <div class="premium-card p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <h2 class="text-2xl font-bold">Payroll Processing</h2>
+                    <div class="flex gap-2">
+                        <button onclick="processPayroll()" class="btn-premium">
+                            <i class="fas fa-calculator mr-2"></i>Process Payroll
+                        </button>
+                        <button onclick="generateComprehensiveReportPDF()" class="btn-premium">
+                            <i class="fas fa-file-pdf mr-2"></i>Export PDF
+                        </button>
+                        <button onclick="testSimpleAdvancePDF()" class="btn-premium" style="background: linear-gradient(135deg, #f97316, #ea580c);">
+                            <i class="fas fa-file-pdf mr-2"></i>Advance Report PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="table-premium w-full">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th title="Working Days (Present + Off + OT + Adjusted - Absent)">Days*</th>
+                                <th>Basic</th>
+                                <th>HRA</th>
+                                <th>Conv.</th>
+                                <th>Other</th>
+                                <th>OT Amount</th>
+                                <th>Gross</th>
+                                <th>PF</th>
+                                <th>ESIC</th>
+                                <th>PT</th>
+                                <th>Advance</th>
+                                <th>Total Ded.</th>
+                                <th>Net Pay</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payrollTableBody">
+                            <!-- Payroll rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="content-reports" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Payslips -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-file-pdf text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Payslips</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Generate individual payslips</p>
+                        </div>
+                    </div>
+                    <button onclick="showPayslipSelector()" class="btn-premium w-full">
+                        <i class="fas fa-download mr-2"></i>Generate Payslips
+                    </button>
+                </div>
+
+                <!-- Bank Statement -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-university text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Bank Statement</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Export bank payment file</p>
+                        </div>
+                    </div>
+                    <button onclick="generateBankStatement()" class="btn-premium w-full" style="background: linear-gradient(135deg, #4ade80, #22c55e);">
+                        <i class="fas fa-download mr-2"></i>Generate Statement
+                    </button>
+                </div>
+
+                <!-- Government Files -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-file-contract text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Government Files</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">PF, ESIC, PT returns</p>
+                        </div>
+                    </div>
+                    <button onclick="generateGovernmentFiles()" class="btn-premium w-full" style="background: linear-gradient(135deg, #a78bfa, #8b5cf6);">
+                        <i class="fas fa-download mr-2"></i>Generate Files
+                    </button>
+                </div>
+
+                <!-- Department Summary -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-chart-pie text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Department Summary</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Department-wise analysis</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="generateDepartmentSummary()" class="btn-premium flex-1" style="background: linear-gradient(135deg, #fbbf24, #f59e0b);">
+                            <i class="fas fa-file-excel mr-1"></i>Excel
+                        </button>
+                        <button onclick="generateDepartmentReport()" class="btn-premium flex-1" style="background: linear-gradient(135deg, #d97706, #b45309);">
+                            <i class="fas fa-file-pdf mr-1"></i>PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Attendance Report -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-calendar-check text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Attendance Report</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Monthly attendance summary</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="generateAttendanceReport()" class="btn-premium flex-1" style="background: linear-gradient(135deg, #fb7185, #f43f5e);">
+                            <i class="fas fa-file-excel mr-1"></i>Excel
+                        </button>
+                        <button onclick="generateAttendanceReportPDF()" class="btn-premium flex-1" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
+                            <i class="fas fa-file-pdf mr-1"></i>PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Comprehensive Report -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-file-alt text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Master Report</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">All data in one report</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="generateComprehensiveReport()" class="btn-premium flex-1" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+                            <i class="fas fa-file-excel mr-1"></i>Excel
+                        </button>
+                        <button onclick="generateComprehensiveReportPDF()" class="btn-premium flex-1" style="background: linear-gradient(135deg, #4338ca, #3730a3);">
+                            <i class="fas fa-file-pdf mr-1"></i>PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Professional Master Report -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-crown text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Professional Master Report</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Corporate-grade PDF with visuals</p>
+                        </div>
+                    </div>
+                    <button onclick="generateMasterReportPDF()" class="btn-premium w-full" style="background: linear-gradient(135deg, #9333ea, #ec4899);">
+                        <i class="fas fa-file-pdf mr-2"></i>Generate Professional PDF
+                    </button>
+                </div>
+
+                <!-- Doctor Payslips -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-user-md text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Doctor Payslips</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Generate doctor payslips</p>
+                        </div>
+                    </div>
+                    <button onclick="generateAllDoctorPayslips()" class="btn-premium w-full" style="background: linear-gradient(135deg, #14b8a6, #06b6d4);">
+                        <i class="fas fa-file-medical mr-2"></i>Generate All
+                    </button>
+                </div>
+
+                <!-- Doctors Summary -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-hospital-user text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Doctors Summary</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Comprehensive doctors report</p>
+                        </div>
+                    </div>
+                    <button onclick="generateDoctorsSummaryReport()" class="btn-premium w-full" style="background: linear-gradient(135deg, #10b981, #14b8a6);">
+                        <i class="fas fa-chart-line mr-2"></i>Generate Report
+                    </button>
+                </div>
+
+                <!-- Advance Loans Report -->
+                <div class="premium-card p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-hand-holding-usd text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Advance Loans Report</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Pending advances & EMI schedules</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="showAdvanceReportModal()" class="btn-premium flex-1" style="background: linear-gradient(135deg, #f97316, #ea580c);">
+                            <i class="fas fa-eye mr-1"></i>View
+                        </button>
+                        <button onclick="debugQuickExportAdvanceExcel()" class="btn-premium flex-1" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
+                            <i class="fas fa-file-excel mr-1"></i>Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Employee Modal -->
+    <div id="addEmployeeModal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="modal-content w-full max-w-md max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold mb-4">Add New Employee</h3>
+                <form onsubmit="addEmployee(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Employee ID</label>
+                            <input type="text" name="id" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+                            <input type="text" name="name" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department</label>
+                            <div class="flex gap-2">
+                                <select name="department" required class="form-input flex-1">
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                                <button type="button" onclick="showDepartmentManager()" 
+                                        class="px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors" 
+                                        title="Manage Departments">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Designation</label>
+                            <input type="text" name="designation" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bank Account</label>
+                            <input type="text" name="bankAccount" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">IFSC Code</label>
+                            <input type="text" name="ifsc" required class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Basic Salary</label>
+                            <input type="number" name="basicSalary" required min="1" class="form-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">HRA (House Rent Allowance)</label>
+                            <input type="number" name="hra" min="0" class="form-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">CA (Conveyance Allowance)</label>
+                            <input type="number" name="conveyance" min="0" class="form-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Other Allowances</label>
+                            <input type="number" name="otherAllowances" min="0" class="form-input" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                            <select name="status" required class="form-input">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Applicable Deductions</label>
+                            <div class="flex flex-wrap gap-4">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="hasPF" value="true" checked class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">PF (Provident Fund)</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="hasESIC" value="true" checked class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">ESIC</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="hasPT" value="true" checked class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">PT (Professional Tax)</span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Uncheck if any deduction is not applicable for this employee</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-6">
+                        <button type="button" onclick="closeModal('addEmployeeModal')" class="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-premium">
+                            Add Employee
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payslip Selector Modal -->
+    <div id="payslipModal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="modal-content">
+            <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Generate Payslips</h3>
+                <div class="mb-4">
+                    <input type="text" id="payslipSearch" placeholder="Search employees..." 
+                           class="form-input" 
+                           onkeyup="filterPayslipEmployees()">
+                </div>
+                <div class="mb-4">
+                    <button onclick="selectAllPayslips(true)" class="btn-premium mr-2">Select All</button>
+                    <button onclick="selectAllPayslips(false)" class="btn-premium" style="background: linear-gradient(135deg, #f87171, #ef4444);">Deselect All</button>
+                </div>
+                <div id="payslipEmployeeList" class="space-y-2 mb-6 max-h-60 overflow-y-auto">
+                    <!-- Employee checkboxes will be populated here -->
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button onclick="closeModal('payslipModal')" class="px-6 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors">
+                        Cancel
+                    </button>
+                    <button onclick="generateSelectedPayslips()" class="btn-premium">
+                        <i class="fas fa-file-pdf mr-2"></i>Generate Selected
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advance Management Modal -->
+    <div id="advanceModal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="modal-content w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+            <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Advance Management</h3>
+                
+                <div class="space-y-6">
+                    <!-- Employee Info -->
+                    <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Employee</p>
+                        <p id="advanceEmployeeName" class="font-semibold text-gray-800 dark:text-gray-200"></p>
+                        <p id="advanceEmployeeDept" class="text-sm text-gray-600 dark:text-gray-400"></p>
+                    </div>
+
+                    <!-- New Advance Form -->
+                    <div class="border-t pt-4">
+                        <h4 class="text-lg font-semibold mb-3">Create New Advance Loan</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Total Amount</label>
+                                <input type="number" id="advanceAmount" min="0" step="100" class="form-input" placeholder="10000">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">EMI Months</label>
+                                <select id="advanceMonths" class="form-input">
+                                    <option value="1">1 Month (One-time)</option>
+                                    <option value="2">2 Months</option>
+                                    <option value="3">3 Months</option>
+                                    <option value="4">4 Months</option>
+                                    <option value="5">5 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="9">9 Months</option>
+                                    <option value="12">12 Months</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start Month</label>
+                                <input type="month" id="advanceStartMonth" class="form-input" value="${currentMonth}">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">EMI Amount</label>
+                                <input type="text" id="advanceEMI" class="form-input bg-gray-100" readonly>
+                            </div>
+                        </div>
+                        <button onclick="createAdvance()" class="btn-premium mt-4">
+                            <i class="fas fa-plus mr-2"></i>Create Advance Loan
+                        </button>
+                    </div>
+
+                    <!-- Active Loans -->
+                    <div class="border-t pt-4">
+                        <h4 class="text-lg font-semibold mb-3">Active Loans</h4>
+                        <div id="activeLoansContainer" class="space-y-3">
+                            <!-- Active loans will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Loan History -->
+                    <div class="border-t pt-4">
+                        <h4 class="text-lg font-semibold mb-3">Loan History</h4>
+                        <div id="loanHistoryContainer" class="space-y-3">
+                            <!-- Loan history will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" onclick="closeModal('advanceModal')" class="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Data Modal -->
+    <div id="importModal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="modal-content w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+            <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">Import Employee Data</h3>
+                
+                <div class="space-y-6">
+                    <!-- File Upload Section -->
+                    <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Drag and drop your CSV or Excel file here, or click to browse</p>
+                        <input type="file" id="importFile" accept=".csv,.xlsx,.xls" class="hidden" onchange="handleFileSelect(event)">
+                        <button onclick="document.getElementById('importFile').click()" class="btn-premium">
+                            <i class="fas fa-folder-open mr-2"></i>Choose File
+                        </button>
+                    </div>
+
+                    <!-- File Info -->
+                    <div id="fileInfo" class="hidden">
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Selected file:</p>
+                            <p id="fileName" class="font-semibold text-gray-800 dark:text-gray-200"></p>
+                        </div>
+                    </div>
+
+                    <!-- Import Options -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Import Strategy</label>
+                        <select id="mergeStrategy" class="form-input">
+                            <option value="update">Update existing employees (recommended)</option>
+                            <option value="skip">Skip existing employees</option>
+                            <option value="add">Add all as new (may create duplicates)</option>
+                        </select>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div id="importPreview" class="hidden">
+                        <h4 class="text-lg font-semibold mb-2">Preview</h4>
+                        <div class="overflow-x-auto">
+                            <table class="table-premium w-full text-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                        <th>Bank Account</th>
+                                        <th>IFSC</th>
+                                        <th>PF (UAN)</th>
+                                        <th>ESIC</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="importPreviewBody">
+                                    <!-- Preview rows will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="importSummary" class="text-sm text-gray-600 dark:text-gray-400 mt-2"></p>
+                    </div>
+
+                    <!-- Error Section -->
+                    <div id="importErrors" class="hidden">
+                        <div class="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4">
+                            <h4 class="text-red-800 dark:text-red-200 font-semibold mb-2">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>Import Errors
+                            </h4>
+                            <ul id="errorList" class="text-sm text-red-700 dark:text-red-300 list-disc list-inside">
+                                <!-- Errors will be listed here -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Help Section -->
+                    <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-4">
+                        <h4 class="text-blue-800 dark:text-blue-200 font-semibold mb-2">
+                            <i class="fas fa-info-circle mr-2"></i>Import Instructions
+                        </h4>
+                        <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                            <li>• Supported formats: CSV, Excel (.xlsx, .xls)</li>
+                            <li>• Required columns: Name, BankAccount, IFSC</li>
+                            <li>• Optional columns: ID, Department, Designation, BasicSalary, UAN, ESICNumber, etc.</li>
+                            <li>• Column names are case-insensitive</li>
+                        </ul>
+                        <button onclick="downloadSampleTemplate()" class="mt-3 text-blue-600 dark:text-blue-400 hover:underline text-sm">
+                            <i class="fas fa-download mr-1"></i>Download Sample Template
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" onclick="closeModal('importModal')" class="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                        Cancel
+                    </button>
+                    <button id="importButton" onclick="performImport()" class="btn-premium" disabled>
+                        <i class="fas fa-upload mr-2"></i>Import Employees
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Production Configuration -->
+    <script src="src/services/supabase-config.js" type="module"></script>
+    <script src="src/services/employee-service.js" type="module"></script>
+    <script src="src/services/attendance-service.js" type="module"></script>
+    
+    <!-- Core JavaScript Modules -->
+    <script src="src/scripts/core/ui-interactions.js"></script>
+    <script src="src/scripts/core/data-persistence.js"></script>
+    <script src="src/scripts/core/payroll-calculations.js"></script>
+    <script src="src/scripts/modules/attendance-management.js"></script>
+    <script src="src/scripts/modules/pdf-reports.js"></script>
+    <script src="src/scripts/modules/doctors-management.js"></script>
+    <script src="src/scripts/reports/doctors-pdf-reports.js"></script>
+    <script src="src/scripts/reports/master-report-pdf.js"></script>
+    <script src="src/scripts/reports/advance-reports.js"></script>
+    <script src="src/scripts/utils/data-import.js"></script>
+    <script src="src/scripts/utils/advance-management.js"></script>
+    
+    <!-- Advance Reports Debug & Fallback -->
+    <script>
+        // Debug function to check what's happening
+        function debugAdvanceDownload() {
+            console.log('🔍 Debugging advance download...');
+            console.log('XLSX available:', typeof XLSX !== 'undefined');
+            console.log('generateAdvanceReport available:', typeof generateAdvanceReport === 'function');
+            console.log('exportAdvanceReportExcel available:', typeof exportAdvanceReportExcel === 'function');
+            console.log('quickExportAdvanceExcel available:', typeof quickExportAdvanceExcel === 'function');
+            
+            const advanceData = localStorage.getItem('payroll_advanceLoans');
+            console.log('Advance data in localStorage:', advanceData ? 'Available' : 'Not found');
+            
+            if (advanceData) {
+                const parsed = JSON.parse(advanceData);
+                console.log('Advance data employees:', Object.keys(parsed));
+            }
+        }
+
+        // Simple fallback export function
+        function fallbackAdvanceExport() {
+            console.log('🚀 Running fallback advance export...');
+            
+            try {
+                if (typeof XLSX === 'undefined') {
+                    alert('XLSX library not loaded. Please refresh the page.');
+                    return;
+                }
+
+                // Get advance loans data
+                const advanceData = localStorage.getItem('payroll_advanceLoans');
+                if (!advanceData) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No Data',
+                        text: 'No advance loans found. Create some advance loans first.',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    return;
+                }
+
+                const loansData = JSON.parse(advanceData);
+                const wb = XLSX.utils.book_new();
+
+                // Create summary data
+                const summaryData = [
+                    ['Advance Loans Report'],
+                    ['Generated on:', new Date().toLocaleDateString('en-IN')],
+                    [''],
+                    ['Employee', 'Department', 'Total Loans', 'Active Amount', 'Status']
+                ];
+
+                Object.keys(loansData).forEach(employeeId => {
+                    const employee = employees.find(emp => emp.id === employeeId);
+                    const loans = loansData[employeeId] || [];
+                    const activeLoans = loans.filter(loan => loan.status === 'active');
+                    const totalActiveAmount = activeLoans.reduce((sum, loan) => sum + (loan.remainingAmount || 0), 0);
+
+                    if (employee && activeLoans.length > 0) {
+                        summaryData.push([
+                            employee.name,
+                            employee.department,
+                            activeLoans.length,
+                            totalActiveAmount,
+                            'Active'
+                        ]);
+                    }
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, ws, 'Advance Summary');
+
+                // Download file
+                const fileName = `Advance_Report_${currentMonth.replace('-', '_')}_${Date.now()}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Export Complete!',
+                    text: `Report exported as ${fileName}`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                console.log('✅ Fallback export completed:', fileName);
+
+            } catch (error) {
+                console.error('❌ Fallback export error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Export Failed',
+                    text: 'Error: ' + error.message
+                });
+            }
+        }
+
+        // Enhanced quick export with debugging
+        function debugQuickExportAdvanceExcel() {
+            console.log('🎯 Debug quick export called...');
+            debugAdvanceDownload();
+
+            if (typeof quickExportAdvanceExcel === 'function') {
+                console.log('✅ Using original quickExportAdvanceExcel');
+                quickExportAdvanceExcel();
+            } else {
+                console.log('⚠️ quickExportAdvanceExcel not available, using fallback');
+                fallbackAdvanceExport();
+            }
+        }
+
+        // Make debug functions available globally
+        window.debugAdvanceDownload = debugAdvanceDownload;
+        window.fallbackAdvanceExport = fallbackAdvanceExport;
+        window.debugQuickExportAdvanceExcel = debugQuickExportAdvanceExcel;
+        
+        // Test simple advance PDF function
+        function testSimpleAdvancePDF() {
+            console.log('🎯 testSimpleAdvancePDF called');
+            
+            try {
+                // Check jsPDF availability
+                if (typeof window.jspdf === 'undefined') {
+                    console.error('❌ jsPDF not available');
+                    alert('jsPDF library not loaded. Please refresh the page.');
+                    return;
+                }
+                console.log('✅ jsPDF library available');
+                
+                // Check advance data
+                const advanceData = localStorage.getItem('payroll_advanceLoans');
+                if (!advanceData) {
+                    console.log('❌ No advance loans data');
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No Data',
+                        text: 'No advance loans found. Please setup test data first.',
+                        confirmButtonText: 'Setup Test Data',
+                        showCancelButton: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.open('setup-test-advances.html', '_blank');
+                        }
+                    });
+                    return;
+                }
+                console.log('✅ Advance loans data found');
+                
+                const loansData = JSON.parse(advanceData);
+                console.log('📊 Loans data:', Object.keys(loansData).length, 'employees');
+                
+                // Create simple PDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                
+                // Header
+                doc.setFontSize(18);
+                doc.setFont(undefined, 'bold');
+                doc.text('Advance Loans Report', 20, 20);
+                
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                doc.text('Generated on: ' + new Date().toLocaleDateString('en-IN'), 20, 30);
+                
+                let yPos = 50;
+                
+                // Summary
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.text('Summary', 20, yPos);
+                yPos += 10;
+                
+                let totalEmployees = 0;
+                let totalAmount = 0;
+                
+                Object.keys(loansData).forEach(employeeId => {
+                    const employeeLoans = loansData[employeeId] || [];
+                    const activeLoans = employeeLoans.filter(loan => loan.status === 'active');
+                    if (activeLoans.length > 0) {
+                        totalEmployees++;
+                        totalAmount += activeLoans.reduce((sum, loan) => sum + (loan.remainingAmount || 0), 0);
+                    }
+                });
+                
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                doc.text('Total Employees with Active Loans: ' + totalEmployees, 20, yPos);
+                yPos += 5;
+                doc.text('Total Pending Amount: ₹' + totalAmount.toLocaleString('en-IN'), 20, yPos);
+                yPos += 15;
+                
+                // Employee list
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('Employee Details', 20, yPos);
+                yPos += 10;
+                
+                Object.keys(loansData).forEach(employeeId => {
+                    const employeeLoans = loansData[employeeId] || [];
+                    const activeLoans = employeeLoans.filter(loan => loan.status === 'active');
+                    const amount = activeLoans.reduce((sum, loan) => sum + (loan.remainingAmount || 0), 0);
+                    
+                    if (activeLoans.length > 0) {
+                        doc.setFontSize(9);
+                        doc.setFont(undefined, 'normal');
+                        doc.text(employeeId + ': ' + activeLoans.length + ' loans, ₹' + amount.toLocaleString('en-IN'), 20, yPos);
+                        yPos += 5;
+                    }
+                });
+                
+                // Save PDF
+                const fileName = 'Advance_Report_' + new Date().toISOString().substring(0, 7).replace('-', '_') + '.pdf';
+                doc.save(fileName);
+                
+                console.log('✅ PDF saved successfully:', fileName);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'PDF Generated!',
+                    text: 'Advance report PDF downloaded: ' + fileName,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                
+            } catch (error) {
+                console.error('❌ Error in testSimpleAdvancePDF:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'PDF Generation Failed',
+                    text: 'Error: ' + error.message,
+                    confirmButtonText: 'Check Console'
+                });
+            }
+        }
+        
+        window.testSimpleAdvancePDF = testSimpleAdvancePDF;
+    </script>
+
+    <!-- Dashboard and Chart Module -->
+    <script>
+        // Dashboard and Chart Functions
+        function updateDashboard() {
+            const activeEmployees = employees.filter(emp => emp.status === 'Active');
+            document.getElementById('total-employees').textContent = employees.length;
+            
+            // Calculate payroll if not already done
+            if (payrollData.length === 0) {
+                processPayroll(false);
+            }
+            
+            const grossTotal = payrollData.reduce((sum, emp) => sum + (emp.grossSalary || 0), 0);
+            const netTotal = payrollData.reduce((sum, emp) => sum + (emp.netPay || 0), 0);
+            const deductionsTotal = payrollData.reduce((sum, emp) => sum + (emp.totalDeductions || 0), 0);
+            
+            document.getElementById('gross-payroll').textContent = '₹' + grossTotal.toLocaleString('en-IN');
+            document.getElementById('total-net-pay').textContent = '₹' + netTotal.toLocaleString('en-IN');
+            document.getElementById('total-deductions').textContent = '₹' + deductionsTotal.toLocaleString('en-IN');
+            document.getElementById('deduction-percentage').textContent = 
+                grossTotal > 0 ? ((deductionsTotal / grossTotal) * 100).toFixed(1) + '%' : '0%';
+            
+            // Update recent activities
+            updateRecentActivities();
+            
+            // Update charts
+            updateCharts();
+        }
+
+        function updateRecentActivities() {
+            const container = document.getElementById('recentActivities');
+            container.innerHTML = '';
+            
+            const recentActivities = activities.slice(-5).reverse();
+            recentActivities.forEach(activity => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-circle text-blue-500 text-xs"></i>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">${activity.message}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">${formatTime(activity.timestamp)}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return Math.floor(diff / 60000) + ' min ago';
+            if (diff < 86400000) return Math.floor(diff / 3600000) + ' hours ago';
+            return date.toLocaleDateString();
+        }
+
+        function addActivity(message) {
+            activities.push({
+                message: message,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Keep only last 50 activities
+            if (activities.length > 50) {
+                activities = activities.slice(-50);
+            }
+            
+            updateRecentActivities();
+        }
+
+        // Chart Functions
+        function initializeCharts() {
+            // Check if Chart.js is loaded
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js not loaded, skipping chart initialization');
+                return;
+            }
+            
+            // Department Distribution Chart
+            const deptCtx = document.getElementById('departmentChart');
+            if (deptCtx) {
+                const deptData = getDepartmentData();
+                new Chart(deptCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(deptData),
+                        datasets: [{
+                            data: Object.values(deptData),
+                            backgroundColor: [
+                                '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateCharts() {
+            // Update chart data if needed
+        }
+
+        function getDepartmentData() {
+            const deptCount = {};
+            employees.forEach(emp => {
+                if (emp.status === 'Active') {
+                    deptCount[emp.department] = (deptCount[emp.department] || 0) + 1;
+                }
+            });
+            return deptCount;
+        }
+
+        // Generate Sample Data
+        function generateSampleData() {
+            if (employees.length === 0) {
+                const departments = ['IT', 'HR', 'Accounts', 'Sales', 'Marketing'];
+                const designations = ['Manager', 'Executive', 'Senior Executive', 'Team Lead', 'Director'];
+                const names = [
+                    'Rajesh Kumar', 'Priya Sharma', 'Amit Patel', 'Sunita Reddy', 'Vikram Singh',
+                    'Anita Desai', 'Suresh Iyer', 'Kavita Mehta', 'Ramesh Gupta', 'Deepa Nair'
+                ];
+
+                for (let i = 1; i <= 70; i++) {
+                    employees.push({
+                        id: `EMP${String(i).padStart(3, '0')}`,
+                        name: names[i % names.length] + ' ' + i,
+                        department: departments[i % departments.length],
+                        designation: designations[i % designations.length],
+                        bankAccount: `${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+                        ifsc: 'SBIN0001234',
+                        basicSalary: Math.floor(Math.random() * 50000) + 20000,
+                        hra: 0,
+                        conveyance: 0,
+                        otherAllowances: 0,
+                        status: i <= 69 ? 'Active' : 'Inactive',
+                        uan: `${Math.floor(Math.random() * 900000000000) + 100000000000}`,
+                        esicNumber: `${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+                        advance: i % 10 === 0 ? Math.floor(Math.random() * 5000) + 1000 : 0,
+                        hasPF: Math.random() > 0.1, // 90% have PF
+                        hasESIC: Math.random() > 0.2, // 80% have ESIC
+                        hasPT: Math.random() > 0.15 // 85% have PT
+                    });
+                }
+            }
+
+            // Initialize attendance for current month
+            if (!attendance[currentMonth]) {
+                attendance[currentMonth] = {};
+                employees.forEach(emp => {
+                    if (emp.status === 'Active') {
+                        attendance[currentMonth][emp.id] = generateMonthlyAttendance();
+                    }
+                });
+            }
+
+            // Process payroll immediately after generating sample data
+            setTimeout(() => {
+                if (typeof processPayroll === 'function' && employees.length > 0) {
+                    try {
+                        processPayroll(false);
+                        console.log('✅ Auto-processed payroll for', payrollData.length, 'employees');
+                    } catch (error) {
+                        console.error('❌ Failed to auto-process payroll:', error);
+                    }
+                } else {
+                    console.warn('⚠️ processPayroll function not available or no employees');
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "name": "shishuraksha-payroll-system",
+  "version": "2.0.0",
+  "description": "Comprehensive payroll management system for Shishuraksha Children's Hospital",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000",
+    "build": "npm run build:prod",
+    "build:prod": "node scripts/build-production.js",
+    "preview": "npm run build && python -m http.server 8000 -d dist",
+    "test": "echo \"No tests configured yet\"",
+    "lint": "eslint public/js/**/*.js",
+    "format": "prettier --write \"public/**/*.{js,css,html}\"",
+    "backup": "node scripts/backup.js",
+    "deploy": "npm run build && vercel --prod",
+    "deploy:preview": "npm run build && vercel"
+  },
+  "keywords": [
+    "payroll",
+    "hrms",
+    "hospital",
+    "employee-management",
+    "attendance",
+    "salary",
+    "healthcare"
+  ],
+  "author": "Professional Payroll Solutions",
+  "license": "Proprietary",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/shishuraksha-payroll.git"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0",
+    "eslint": "^8.0.0",
+    "fs-extra": "^11.0.0",
+    "http-server": "^14.0.0",
+    "prettier": "^2.0.0",
+    "terser": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ]
+}
