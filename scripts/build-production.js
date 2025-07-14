@@ -27,10 +27,13 @@ async function buildProduction() {
             console.log('⚠️ No public directory found, skipping');
         }
 
-        // Copy index.html to build directory
-        if (await fs.pathExists('index.html')) {
-            await fs.copy('index.html', path.join(BUILD_DIR, 'index.html'));
-            console.log('✅ Copied index.html');
+        // Copy HTML files to build directory
+        const htmlFiles = ['index.html', 'login.html'];
+        for (const htmlFile of htmlFiles) {
+            if (await fs.pathExists(htmlFile)) {
+                await fs.copy(htmlFile, path.join(BUILD_DIR, htmlFile));
+                console.log(`✅ Copied ${htmlFile}`);
+            }
         }
 
         // Copy src directory
