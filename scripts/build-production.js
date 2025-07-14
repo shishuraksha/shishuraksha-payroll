@@ -19,18 +19,34 @@ async function buildProduction() {
         await fs.ensureDir(BUILD_DIR);
         console.log('✅ Cleaned build directory');
 
-        // Copy public files
-        await fs.copy(PUBLIC_DIR, BUILD_DIR);
-        console.log('✅ Copied public files');
+        // Copy public files if they exist
+        if (await fs.pathExists(PUBLIC_DIR)) {
+            await fs.copy(PUBLIC_DIR, BUILD_DIR);
+            console.log('✅ Copied public files');
+        } else {
+            console.log('⚠️ No public directory found, skipping');
+        }
 
-        // Copy root files
-        const rootFiles = ['index.html', 'package.json', 'vercel.json'];
-        for (const file of rootFiles) {
+        // Copy index.html to build directory
+        if (await fs.pathExists('index.html')) {
+            await fs.copy('index.html', path.join(BUILD_DIR, 'index.html'));
+            console.log('✅ Copied index.html');
+        }
+
+        // Copy src directory
+        if (await fs.pathExists('src')) {
+            await fs.copy('src', path.join(BUILD_DIR, 'src'));
+            console.log('✅ Copied src directory');
+        }
+
+        // Copy any other necessary files
+        const additionalFiles = ['vercel.json'];
+        for (const file of additionalFiles) {
             if (await fs.pathExists(file)) {
                 await fs.copy(file, path.join(BUILD_DIR, file));
             }
         }
-        console.log('✅ Copied root files');
+        console.log('✅ Copied additional files');
 
         // Process HTML files
         await processHTMLFiles();
