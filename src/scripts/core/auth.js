@@ -57,36 +57,65 @@ class AuthSystem {
     }
 
     checkExistingSession() {
-        const savedSession = localStorage.getItem('payroll_session');
-        const savedUser = localStorage.getItem('payroll_user');
+        const savedSession = localStorage.getItem('payroll_session') || sessionStorage.getItem('payroll_session');
+        const savedUser = localStorage.getItem('payroll_user') || sessionStorage.getItem('payroll_user');
+        
+        console.log('🔍 Checking session - Current path:', window.location.pathname);
         
         if (savedSession && savedUser) {
-            const sessionData = JSON.parse(savedSession);
-            const userData = JSON.parse(savedUser);
-            
-            // Check if session is still valid
-            if (this.isSessionValid(sessionData)) {
-                this.currentUser = userData;
-                this.isLoggedIn = true;
+            try {
+                const sessionData = JSON.parse(savedSession);
+                const userData = JSON.parse(savedUser);
                 
-                // If we're on login page, redirect to main app
-                if (window.location.pathname.includes('login.html') || window.location.pathname === '/login.html') {
-                    this.redirectToApp();
+                // Check if session is still valid
+                if (this.isSessionValid(sessionData)) {
+                    this.currentUser = userData;
+                    this.isLoggedIn = true;
+                    
+                    console.log('✅ Valid session found for user:', userData.username);
+                    
+                    // Update UI if we're on the main app
+                    if (!this.isOnLoginPage()) {
+                        this.updateUserUI();
+                        this.startSessionTimer();
+                        return;
+                    }
+                    
+                    // If we're on login page with valid session, redirect to main app
+                    if (this.isOnLoginPage()) {
+                        console.log('🔄 Redirecting from login to main app');
+                        this.redirectToApp();
+                    }
+                    return;
                 } else {
-                    // Start session timer
-                    this.startSessionTimer();
+                    console.log('⏰ Session expired, clearing');
+                    this.clearSession();
                 }
-                return;
-            } else {
-                // Session expired, clear it
+            } catch (error) {
+                console.error('❌ Error parsing session data:', error);
                 this.clearSession();
             }
         }
         
         // If not logged in and not on login page, redirect to login
-        if (!window.location.pathname.includes('login.html') && window.location.pathname !== '/login.html') {
+        if (!this.isLoggedIn && !this.isOnLoginPage()) {
+            console.log('🔐 No valid session, redirecting to login');
             this.redirectToLogin();
         }
+    }
+
+    isOnLoginPage() {
+        const path = window.location.pathname;
+        const search = window.location.search;
+        const hash = window.location.hash;
+        
+        // Check for login-related paths and routes
+        return path.includes('login.html') || 
+               path === '/login.html' || 
+               path === '/login' || 
+               path === '/' || 
+               search.includes('login') ||
+               hash.includes('login');
     }
 
     setupLoginForm() {
@@ -207,11 +236,19 @@ class AuthSystem {
         this.startSessionTimer();
         
         // Redirect to main application
-        window.location.href = 'index.html';
+        console.log('🚀 Redirecting to main application');
+        if (this.isOnLoginPage()) {
+            // Use the /app route which maps to index.html in vercel.json
+            window.location.href = '/app';
+        }
     }
 
     redirectToLogin() {
-        window.location.href = 'login.html';
+        console.log('🔐 Redirecting to login page');
+        if (!this.isOnLoginPage()) {
+            // Use the root route which maps to login.html in vercel.json
+            window.location.href = '/';
+        }
     }
 
     logout(showMessage = true) {
@@ -304,6 +341,22 @@ class AuthSystem {
 
     getCurrentUser() {
         return this.currentUser;
+    }
+
+    updateUserUI() {
+        if (!this.currentUser) return;
+        
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const userRole = document.getElementById('userRole');
+        
+        if (userInfo && userName && userRole) {
+            userName.textContent = this.currentUser.name || this.currentUser.username;
+            userRole.textContent = this.currentUser.role.toUpperCase();
+            userInfo.classList.remove('hidden');
+            
+            console.log('✅ User UI updated for:', this.currentUser.username);
+        }
     }
 
     showError(message) {
